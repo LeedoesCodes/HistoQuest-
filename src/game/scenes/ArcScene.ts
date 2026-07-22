@@ -6,7 +6,7 @@ import { BehaviorLogger } from "../behaviorLogger";
 import { classify } from "../classifier";
 import { playStory } from "../presenters/story";
 import { playDecision } from "../presenters/decision";
-import { playMiniGamePlaceholder } from "../presenters/miniGamePlaceholder";
+import { getMiniGame } from "../presenters/miniGames";
 import { COLORS, FONT } from "../ui/theme";
 
 /** Data passed when starting this scene. */
@@ -73,7 +73,7 @@ export class ArcScene extends Phaser.Scene {
         });
       } else if (node.type === "minigame") {
         await this.logger.log("minigame_start", node.id, { key: node.key });
-        const r = await playMiniGamePlaceholder(this, node);
+        const r = await getMiniGame(node.key)(this, node);
         await this.logger.log("minigame_complete", node.id, {
           score: r.score,
           attempts: r.attempts,

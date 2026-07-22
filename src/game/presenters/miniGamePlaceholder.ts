@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import type { MiniGameNode } from "../content/types";
+import type { MiniGameNode, MiniGameResult } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
 
 /**
@@ -11,7 +11,7 @@ import { COLORS, FONT } from "../ui/theme";
 export function playMiniGamePlaceholder(
   scene: Phaser.Scene,
   node: MiniGameNode
-): Promise<{ score: number; attempts: number; msSpent: number }> {
+): Promise<MiniGameResult> {
   return new Promise((resolve) => {
     const { width, height } = scene.scale;
     const startedAt = performance.now();

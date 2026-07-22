@@ -64,3 +64,12 @@ export interface DecisionResult {
   msElapsed: number;
   timedOut: boolean;
 }
+
+/** Every mini-game (real or placeholder) resolves with this shape. */
+export interface MiniGameResult {
+  /** 0..1 — how well the pupil performed. */
+  score: number;
+  /** Total tries including the successful one (feeds the classifier). */
+  attempts: number;
+  msSpent: number;
+}
