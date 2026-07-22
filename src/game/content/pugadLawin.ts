@@ -88,6 +88,27 @@ export const pugadLawinArc: ArcContent = {
         "bahagi ka nito.",
     },
     {
+      id: "pl_recruit_intro",
+      type: "story",
+      text:
+        "Para lumakas ang himagsikan, kailangan ng mas maraming kasapi. " +
+        "Tulungan mong hikayatin ang mga Pilipino na sumapi sa Katipunan — " +
+        "ngunit mag-ingat sa mga guwardiyang Espanyol!",
+    },
+    {
+      id: "pl_minigame_recruit",
+      type: "minigame",
+      key: "katipunan_recruit",
+      title: "Pangangalap ng Katipunero",
+    },
+    {
+      id: "pl_recruit_outro",
+      type: "story",
+      text:
+        "Bawat bagong kasapi ay dagdag na lakas sa hukbo ng himagsikan. " +
+        "Patuloy na lumaganap ang Katipunan sa buong kapuluan.",
+    },
+    {
       id: "pl_code_intro",
       type: "story",
       text:
