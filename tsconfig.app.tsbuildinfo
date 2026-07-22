@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/game/historygame.tsx","./src/game/gameconfig.ts","./src/game/scenes/bootscene.ts","./src/game/scenes/titlescene.ts","./src/shared/supabase.ts","./src/shared/types.ts"],"version":"5.9.3"}

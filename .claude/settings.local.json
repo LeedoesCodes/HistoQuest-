@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/Download/**)",
+      "Bash(python -c \"import docx; print\\('ok'\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)"
+    ]
+  }
+}
