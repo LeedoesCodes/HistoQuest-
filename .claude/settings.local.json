@@ -5,7 +5,12 @@
       "Bash(python -c \"import docx; print\\('ok'\\)\")",
       "Bash(python -c ' *)",
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(python \"C:\\\\Users\\\\lee\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--projects-in-D-HistoQuest\\\\f361c733-8309-40ee-acd5-d34c9d1d266e\\\\scratchpad\\\\make_nb.py\")",
+      "Bash(python -c \"import sklearn, numpy, pandas; print\\('sklearn', sklearn.__version__\\)\")",
+      "Bash(jupyter nbconvert *)",
+      "Bash(grep -vE \"^\\\\s*$\")",
+      "Bash(rm -f ml/_verify.ipynb ml/weights.json)"
     ]
   }
 }
