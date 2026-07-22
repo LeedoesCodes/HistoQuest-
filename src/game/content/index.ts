@@ -9,6 +9,30 @@ import { pugadLawinArc } from "./pugadLawin";
 const mactanArc: ArcContent = {
   arc: "mactan",
   title: "Labanan sa Mactan",
+  assessment: [
+    {
+      id: "mac_q1",
+      question: "Sino ang natalo ni Lapu-Lapu sa Labanan sa Mactan?",
+      choices: [
+        { id: "a", label: "Ferdinand Magellan" },
+        { id: "b", label: "Miguel Lopez de Legazpi" },
+        { id: "c", label: "Rajah Humabon" },
+        { id: "d", label: "Andres Bonifacio" },
+      ],
+      correctChoiceId: "a",
+    },
+    {
+      id: "mac_q2",
+      question: "Saan naganap ang Labanan sa Mactan?",
+      choices: [
+        { id: "a", label: "Maynila" },
+        { id: "b", label: "Mactan, Cebu" },
+        { id: "c", label: "Davao" },
+        { id: "d", label: "Batangas" },
+      ],
+      correctChoiceId: "b",
+    },
+  ],
   nodes: [
     {
       id: "mac_intro_1",
@@ -24,6 +48,30 @@ const mactanArc: ArcContent = {
 const datuBagoArc: ArcContent = {
   arc: "datu_bago",
   title: "Paglaban ni Datu Bago",
+  assessment: [
+    {
+      id: "db_q1",
+      question: "Sinong pinuno ang lumaban sa mga Espanyol sa tabi ng Ilog Davao?",
+      choices: [
+        { id: "a", label: "Datu Bago" },
+        { id: "b", label: "Datu Lapu-Lapu" },
+        { id: "c", label: "Sultan Kudarat" },
+        { id: "d", label: "Rajah Sulayman" },
+      ],
+      correctChoiceId: "a",
+    },
+    {
+      id: "db_q2",
+      question: "Anong pangkat-katutubo ang pinamunuan ni Datu Bago sa paglaban?",
+      choices: [
+        { id: "a", label: "mga Ivatan" },
+        { id: "b", label: "mga Bagobo" },
+        { id: "c", label: "mga Ifugao" },
+        { id: "d", label: "mga Aeta" },
+      ],
+      correctChoiceId: "b",
+    },
+  ],
   nodes: [
     {
       id: "db_intro_1",

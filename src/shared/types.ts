@@ -71,6 +71,7 @@ export interface BehaviorEvent {
 
 export type BehaviorEventType =
   | "arc_start"
+  | "assessment_complete" // payload: { phase: "pre"|"post", score, correct, total }
   | "story_shown"
   | "story_advanced"
   | "decision_shown"

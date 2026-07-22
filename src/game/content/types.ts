@@ -11,8 +11,36 @@ import type { ArcId } from "@shared/types";
 export interface ArcContent {
   arc: ArcId;
   title: string;
+  /**
+   * Auto-scored multiple-choice questions on this arc's history. The SAME set
+   * is asked before the arc (baseline) and after (retention), so post − pre is
+   * the learning gain the study measures. Keep it short (3–5) for Grade 5.
+   */
+  assessment: QuizQuestion[];
   /** Played top to bottom. Every decision path converges back onto this line. */
   nodes: ArcNode[];
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  choices: QuizChoice[];
+  correctChoiceId: string;
+}
+
+export interface QuizChoice {
+  id: string;
+  label: string;
+}
+
+/** "pre" = baseline before the arc, "post" = retention after. */
+export type AssessmentPhase = "pre" | "post";
+
+export interface QuizResult {
+  score: number; // 0..1 = correct / total
+  correct: number;
+  total: number;
+  answers: Record<string, string>; // questionId -> chosen choiceId
 }
 
 export type ArcNode = StoryNode | DecisionNode | MiniGameNode;

@@ -11,6 +11,41 @@ import type { ArcContent } from "./types";
 export const pugadLawinArc: ArcContent = {
   arc: "pugad_lawin",
   title: "Sigaw sa Pugad Lawin",
+  assessment: [
+    {
+      id: "pl_q1",
+      question: "Sino ang pinuno ng Katipunan sa Sigaw sa Pugad Lawin?",
+      choices: [
+        { id: "a", label: "Andres Bonifacio" },
+        { id: "b", label: "Jose Rizal" },
+        { id: "c", label: "Emilio Aguinaldo" },
+        { id: "d", label: "Lapu-Lapu" },
+      ],
+      correctChoiceId: "a",
+    },
+    {
+      id: "pl_q2",
+      question: "Ano ang ginawa ng mga Katipunero bilang tanda ng paghihimagsik?",
+      choices: [
+        { id: "a", label: "Sinunog ang bandila" },
+        { id: "b", label: "Pinunit ang kanilang cedula" },
+        { id: "c", label: "Nagtanim ng puno" },
+        { id: "d", label: "Sumulat ng liham sa hari" },
+      ],
+      correctChoiceId: "b",
+    },
+    {
+      id: "pl_q3",
+      question: "Anong taon naganap ang Sigaw sa Pugad Lawin?",
+      choices: [
+        { id: "a", label: "1521" },
+        { id: "b", label: "1872" },
+        { id: "c", label: "1896" },
+        { id: "d", label: "1946" },
+      ],
+      correctChoiceId: "c",
+    },
+  ],
   nodes: [
     {
       id: "pl_intro_1",

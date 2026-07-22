@@ -6,6 +6,7 @@ import { BehaviorLogger } from "../behaviorLogger";
 import { classify } from "../classifier";
 import { playStory } from "../presenters/story";
 import { playDecision } from "../presenters/decision";
+import { playQuiz } from "../presenters/quiz";
 import { getMiniGame } from "../presenters/miniGames";
 import { COLORS, FONT } from "../ui/theme";
 
@@ -27,6 +28,8 @@ export class ArcScene extends Phaser.Scene {
   private logger!: BehaviorLogger;
   private content!: ArcContent;
   private startedAt = "";
+  private preScore = 0;
+  private postScore = 0;
 
   constructor() {
     super("Arc");
@@ -58,6 +61,16 @@ export class ArcScene extends Phaser.Scene {
   private async run(pupil: Pupil) {
     await this.logger.log("arc_start", this.content.arc, {});
 
+    // Pre-assessment: baseline history knowledge before the arc.
+    const pre = await playQuiz(this, this.content.assessment, "pre");
+    this.preScore = pre.score;
+    await this.logger.log("assessment_complete", `${this.content.arc}_pre`, {
+      phase: "pre",
+      score: pre.score,
+      correct: pre.correct,
+      total: pre.total,
+    });
+
     for (const node of this.content.nodes) {
       if (node.type === "story") {
         await this.logger.log("story_shown", node.id, {});
@@ -82,6 +95,16 @@ export class ArcScene extends Phaser.Scene {
       }
     }
 
+    // Post-assessment: same questions, measures retention (post − pre = gain).
+    const post = await playQuiz(this, this.content.assessment, "post");
+    this.postScore = post.score;
+    await this.logger.log("assessment_complete", `${this.content.arc}_post`, {
+      phase: "post",
+      score: post.score,
+      correct: post.correct,
+      total: post.total,
+    });
+
     await this.logger.log("arc_complete", this.content.arc, {});
     await this.finish(pupil);
   }
@@ -95,8 +118,8 @@ export class ArcScene extends Phaser.Scene {
       arc: this.content.arc,
       startedAt: this.startedAt,
       finishedAt: new Date().toISOString(),
-      preAssessmentScore: 0, // TODO: wire pre-assessment scene
-      postAssessmentScore: 0, // TODO: wire post-assessment scene
+      preAssessmentScore: this.preScore,
+      postAssessmentScore: this.postScore,
       learnerLabel: engagement.label,
       learnerConfidence: engagement.confidence,
       behaviorLog: [...events],
@@ -112,9 +135,13 @@ export class ArcScene extends Phaser.Scene {
   private showSummary(label: string, confidence: number) {
     const { width, height } = this.scale;
     const labelText = label === "deep" ? "Deep Learner" : "Surface Learner";
+    const pct = (s: number) => `${Math.round(s * 100)}%`;
+    const gain = this.postScore - this.preScore;
+    const gainText =
+      gain > 0 ? `+${pct(gain)} ↑` : gain < 0 ? `${pct(gain)} ↓` : "walang pagbabago";
 
     this.add
-      .text(width / 2, height / 2 - 40, "Tapos na ang kabanata!", {
+      .text(width / 2, height / 2 - 80, "Tapos na ang kabanata!", {
         fontFamily: FONT,
         fontSize: "28px",
         color: COLORS.text,
@@ -126,7 +153,17 @@ export class ArcScene extends Phaser.Scene {
     this.add
       .text(
         width / 2,
-        height / 2 + 10,
+        height / 2 - 30,
+        `Natutuhan: ${pct(this.preScore)} → ${pct(this.postScore)}   (${gainText})`,
+        { fontFamily: FONT, fontSize: "18px", color: COLORS.accentText }
+      )
+      .setOrigin(0.5)
+      .setDepth(20);
+
+    this.add
+      .text(
+        width / 2,
+        height / 2 + 2,
         `Engagement: ${labelText}  (${Math.round(confidence * 100)}%)`,
         { fontFamily: FONT, fontSize: "18px", color: COLORS.textMuted }
       )

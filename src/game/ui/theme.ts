@@ -4,7 +4,8 @@ export const COLORS = {
   panel: 0x14203a,
   panelHover: 0x27365a,
   panelStroke: 0x3d5a99,
-  accent: 0xffd54a,
+  accent: 0xffd54a, // number — for shapes/fills
+  accentText: "#ffd54a", // string — for text color
   text: "#ffffff",
   textMuted: "#a9b7d6",
   danger: 0xe4572e,
