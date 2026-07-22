@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import type { MiniGameNode, MiniGameResult } from "../../content/types";
 import { playMiniGamePlaceholder } from "../miniGamePlaceholder";
 import { playCedulaTear } from "./cedulaTear";
+import { playCodeUnscramble } from "./codeUnscramble";
 
 export type MiniGamePresenter = (
   scene: Phaser.Scene,
@@ -18,6 +19,7 @@ export type MiniGamePresenter = (
  */
 const REGISTRY: Record<string, MiniGamePresenter> = {
   cedula_tear: playCedulaTear,
+  code_unscramble: playCodeUnscramble,
 };
 
 export function getMiniGame(key: string): MiniGamePresenter {

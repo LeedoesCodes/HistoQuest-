@@ -87,5 +87,26 @@ export const pugadLawinArc: ArcContent = {
         "Katipunero ang kanilang cedula. Nagsimula na ang himagsikan — at " +
         "bahagi ka nito.",
     },
+    {
+      id: "pl_code_intro",
+      type: "story",
+      text:
+        "May dumating na lihim na mensahe mula sa ibang Katipunero, ngunit " +
+        "nagkagulo ang mga salita para hindi ito mabasa ng mga Espanyol. " +
+        "Kailangan mong ayusin ito.",
+    },
+    {
+      id: "pl_minigame_code",
+      type: "minigame",
+      key: "code_unscramble",
+      title: "Lihim na Code",
+    },
+    {
+      id: "pl_outro_2",
+      type: "story",
+      text:
+        "Naipasa ang mensahe! Sa tulong ng mga lihim na code, patuloy na " +
+        "nag-ugnayan ang mga Katipunero habang lumalaban para sa kalayaan.",
+    },
   ],
 };
