@@ -1,0 +1,66 @@
+import type { ArcId } from "@shared/types";
+
+/**
+ * Arc content is DATA, not code. Each arc is a list of nodes the ArcScene
+ * walks in order. The Story and Decision node types are reusable across all
+ * three arcs; only MiniGame nodes point at arc-specific mechanics.
+ *
+ * This is what lets three arcs share two presenters (see CLAUDE.md rule 5).
+ */
+
+export interface ArcContent {
+  arc: ArcId;
+  title: string;
+  /** Played top to bottom. Every decision path converges back onto this line. */
+  nodes: ArcNode[];
+}
+
+export type ArcNode = StoryNode | DecisionNode | MiniGameNode;
+
+/** A narrated story beat: text, optional illustration, optional voiceover. */
+export interface StoryNode {
+  id: string;
+  type: "story";
+  text: string;
+  /** Asset key loaded in a preloader (later). Optional while art is pending. */
+  image?: string;
+  /** Voiceover audio key (edge-tts MP3s, later). Optional. */
+  vo?: string;
+}
+
+/**
+ * A timed decision point. The pupil picks within `timeLimitMs`; if the timer
+ * runs out we auto-select `defaultChoiceId` (or the first choice) and mark it
+ * timed out. Every choice converges on the same historical outcome — the
+ * choice shapes the experience and the behavioral log, not the history.
+ */
+export interface DecisionNode {
+  id: string;
+  type: "decision";
+  prompt: string;
+  timeLimitMs: number;
+  choices: DecisionChoice[];
+  defaultChoiceId?: string;
+}
+
+export interface DecisionChoice {
+  id: string;
+  label: string;
+  /** Optional: which mini-game this choice routes into (future). */
+  routeTo?: string;
+}
+
+/** Placeholder for an arc-specific mini-game (built per arc later). */
+export interface MiniGameNode {
+  id: string;
+  type: "minigame";
+  /** e.g. "cedula_tear", "katipunan_recruit", "code_unscramble". */
+  key: string;
+  title: string;
+}
+
+export interface DecisionResult {
+  choiceId: string;
+  msElapsed: number;
+  timedOut: boolean;
+}

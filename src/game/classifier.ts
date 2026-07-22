@@ -1,0 +1,80 @@
+import type { BehaviorEvent, LearnerLabel } from "@shared/types";
+
+/**
+ * Engagement classifier — Surface vs Deep Learner.
+ *
+ * The manuscript specifies a LOGISTIC REGRESSION trained on logged behavior.
+ * That model is just weights: label = sigmoid(w · features + b) > 0.5.
+ * You train it offline (Colab, scikit-learn) on teacher-labeled pilot data,
+ * then paste the exported WEIGHTS/BIAS below. No ML runtime ships to the browser.
+ *
+ * Until real weights exist, PLACEHOLDER_WEIGHTS give a plausible heuristic so
+ * the whole pipeline (log → features → label → result) runs end to end and is
+ * testable. Replace the three constants after training; nothing else changes.
+ */
+
+/** Feature order MUST match the training notebook's column order. */
+export const FEATURE_NAMES = [
+  "avg_decision_ms", // slower, deliberate decisions ↔ deeper engagement
+  "timeout_rate", // fraction of decisions that timed out ↔ disengagement
+  "avg_minigame_attempts", // more retries ↔ persistence
+  "minigame_completion_rate", // finished mini-games ↔ engagement
+] as const;
+
+// TODO(colab): replace with exported logistic-regression parameters.
+const PLACEHOLDER_WEIGHTS = [0.0009, -2.5, 0.4, 1.8];
+const PLACEHOLDER_BIAS = -0.6;
+// Normalisers keep features on a comparable scale (also come from training).
+const FEATURE_SCALE = [1, 1, 1, 1];
+
+export interface ClassifierFeatures {
+  avg_decision_ms: number;
+  timeout_rate: number;
+  avg_minigame_attempts: number;
+  minigame_completion_rate: number;
+}
+
+/** Derive the model's feature vector from a session's behavior events. */
+export function extractFeatures(events: readonly BehaviorEvent[]): ClassifierFeatures {
+  const decisions = events.filter((e) => e.type === "decision_made");
+  const miniStarts = events.filter((e) => e.type === "minigame_start");
+  const miniCompletes = events.filter((e) => e.type === "minigame_complete");
+
+  const decisionMs = decisions.map((e) => Number(e.payload.msElapsed ?? 0));
+  const timeouts = decisions.filter((e) => e.payload.timedOut === true).length;
+  const attempts = miniCompletes.map((e) => Number(e.payload.attempts ?? 1));
+
+  const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+
+  return {
+    avg_decision_ms: avg(decisionMs),
+    timeout_rate: decisions.length ? timeouts / decisions.length : 0,
+    avg_minigame_attempts: avg(attempts),
+    minigame_completion_rate: miniStarts.length ? miniCompletes.length / miniStarts.length : 0,
+  };
+}
+
+function sigmoid(z: number): number {
+  return 1 / (1 + Math.exp(-z));
+}
+
+export interface ClassifierResult {
+  label: LearnerLabel;
+  confidence: number; // probability of "deep"
+  features: ClassifierFeatures;
+}
+
+/** Run inference. `pDeep > 0.5` → deep learner. */
+export function classify(events: readonly BehaviorEvent[]): ClassifierResult {
+  const features = extractFeatures(events);
+  const x = [
+    features.avg_decision_ms,
+    features.timeout_rate,
+    features.avg_minigame_attempts,
+    features.minigame_completion_rate,
+  ];
+  let z = PLACEHOLDER_BIAS;
+  for (let i = 0; i < x.length; i++) z += PLACEHOLDER_WEIGHTS[i] * (x[i] / FEATURE_SCALE[i]);
+  const pDeep = sigmoid(z);
+  return { label: pDeep > 0.5 ? "deep" : "surface", confidence: pDeep, features };
+}

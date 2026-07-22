@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { TitleScene } from "./scenes/TitleScene";
+import { ArcScene } from "./scenes/ArcScene";
 // BootScene is kept for when real assets exist (a dedicated Preloader).
 // For now there is nothing to preload, so TitleScene is the entry scene.
 // import { BootScene } from "./scenes/BootScene";
@@ -19,6 +20,6 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: [TitleScene],
+    scene: [TitleScene, ArcScene],
   };
 }

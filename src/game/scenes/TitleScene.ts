@@ -70,8 +70,8 @@ export class TitleScene extends Phaser.Scene {
     card.on("pointerover", () => card.setFillStyle(0x27365a));
     card.on("pointerout", () => card.setFillStyle(0x1f2a44));
     card.on("pointerdown", () => {
-      // Later: this.scene.start("Arc", { arc: arc.id })
       this.game.events.emit("arc-selected", arc.id);
+      this.scene.start("Arc", { arc: arc.id });
     });
   }
 }

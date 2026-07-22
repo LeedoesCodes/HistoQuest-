@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Phaser from "phaser";
 import { createGameConfig } from "./gameConfig";
-import type { HistoryGameProps, ArcId } from "@shared/types";
+import type { HistoryGameProps, ArcId, HistorySessionResult } from "@shared/types";
 
 /**
  * HistoryGame — the SINGLE entry point the shell mounts (see types.ts).
@@ -18,20 +18,27 @@ export function HistoryGame({ pupil, onComplete, startArc }: HistoryGameProps) {
 
     const game = new Phaser.Game(createGameConfig(hostRef.current));
     gameRef.current = game;
+    // Make the pupil available to every scene (ArcScene reads it for logging).
+    game.registry.set("pupil", pupil);
     if (import.meta.env.DEV) (window as unknown as { __game: Phaser.Game }).__game = game;
 
     // Bridge: Phaser scenes emit events, React handles cross-cutting concerns.
     const onArcSelected = (arc: ArcId) => {
-      console.log("[HistoryGame] arc selected:", arc, "pupil:", pupil.displayName);
-      // Later this drives the arc flow; for now it just logs.
+      console.log("[HistoryGame] arc started:", arc, "pupil:", pupil.displayName);
+    };
+    const onArcFinished = (result: HistorySessionResult) => {
+      console.log("[HistoryGame] arc finished:", result);
+      onComplete(result);
     };
     game.events.on("arc-selected", onArcSelected);
+    game.events.on("arc-finished", onArcFinished);
 
     let destroyed = false;
     const destroy = () => {
       if (destroyed) return;
       destroyed = true;
       game.events.off("arc-selected", onArcSelected);
+      game.events.off("arc-finished", onArcFinished);
       game.destroy(true); // true → also removes the <canvas>
     };
 
@@ -46,8 +53,7 @@ export function HistoryGame({ pupil, onComplete, startArc }: HistoryGameProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep references used so the compiler is happy while these are stubs.
-  void onComplete;
+  // startArc (jump straight into an arc) is not wired yet.
   void startArc;
 
   return <div ref={hostRef} style={{ width: "100%", maxWidth: 800, margin: "0 auto" }} />;
