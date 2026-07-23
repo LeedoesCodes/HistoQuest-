@@ -15,6 +15,21 @@ export const MESSAGES = {
   // --- Story ---
   "story.continue": { fil: "▶  Pindutin para magpatuloy", en: "▶  Tap to continue" },
 
+  // --- Title card ---
+  "titlecard.dramatised": {
+    fil: "Batay sa tunay na pangyayari. Ang ilang tauhan at usapan ay likha para sa kuwentong ito.",
+    en: "Based on real events. Some characters and conversations were created for this story.",
+  },
+
+  // --- Character cards ---
+  "char.real": { fil: "Tunay na tao sa kasaysayan", en: "Real historical figure" },
+  "char.fictional": { fil: "Likhang tauhan", en: "Fictional character" },
+
+  // --- Did you know (fact vs. story) ---
+  "dyk.title": { fil: "Alam Mo Ba?", en: "Did You Know?" },
+  "dyk.real": { fil: "Totoo:", en: "True:" },
+  "dyk.invented": { fil: "Kuwento lang:", en: "Story only:" },
+
   // --- Quiz ---
   "quiz.pre.title": { fil: "Panimulang Pagsusulit", en: "Pre-Test" },
   "quiz.pre.sub": {

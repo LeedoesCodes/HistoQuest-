@@ -319,10 +319,21 @@ All three converge on M10. Each sets a one-line flavour response:
 
 ---
 
-## 6. Open questions for Lee
+## 6. Decisions (settled — implemented in `src/game/content/mactan.ts`)
 
-1. **Should the ally have a name?** Currently unnamed ("ikaw") so any pupil projects onto them. A name adds warmth but reduces identification.
-2. **Keep Amihan?** She adds emotional stakes but is one more invented element to defend.
-3. **Is Magellan's portrayal acceptable?** I wrote him as determined and mistaken rather than evil. Some teachers prefer a firmer framing of colonisation.
-4. **Length:** 12 beats ≈ 4–6 minutes of reading for a Grade 5 pupil, plus the mini-game. Too long, about right, or too short?
-5. **Do you want an on-screen "dramatised dialogue" disclaimer** at the start of each arc?
+1. **Ally stays unnamed** ("Ikaw" / "You") so any pupil projects onto them. ✅
+2. **Amihan stays** — she gives the danger a face; declared as invented on the closing card. ✅
+3. **Magellan: determined and mistaken, not evil.** The approach is *hard on colonisation, fair to the person* — the arc stays firm about what was demanded (food, tribute, submission to a distant king) without turning a real man into a cartoon. ✅
+4. **Length: 12 beats confirmed** (now 16 nodes with the title, 3 character cards and the closing card). ✅
+5. **Honesty handled by three mechanisms**, not one disclaimer: ✅
+   - cinematic **title card** with a quiet "based on real events" note
+   - a **historicity tag on every character card** (*Tunay na tao sa kasaysayan* / *Likhang tauhan*)
+   - a closing **"Alam Mo Ba?"** card splitting *Totoo* from *Kuwento lang*
+
+### Still open
+
+- **Order:** the pre-test currently runs *before* the title card, so the baseline
+  stays uncontaminated. That is methodologically safer but slightly odd
+  cinematically. Moving the title card first would look better — but only do it
+  for arcs whose quiz does **not** ask about the year shown on the card
+  (Pugad Lawin's quiz asks "anong taon", so it would leak the answer).

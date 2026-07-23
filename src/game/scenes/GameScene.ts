@@ -6,6 +6,9 @@ import { BehaviorLogger } from "../behaviorLogger";
 import { classify } from "../classifier";
 import { playArcSelect } from "../presenters/arcSelect";
 import { playStory } from "../presenters/story";
+import { playTitleCard } from "../presenters/titleCard";
+import { playCharacter } from "../presenters/character";
+import { playDidYouKnow } from "../presenters/didYouKnow";
 import { playDecision } from "../presenters/decision";
 import { playQuiz } from "../presenters/quiz";
 import { getMiniGame } from "../presenters/miniGames";
@@ -106,7 +109,21 @@ export class GameScene extends Phaser.Scene {
 
   private async playNodes(content: ArcContent, logger: BehaviorLogger) {
     for (const node of content.nodes) {
-      if (node.type === "story") {
+      // Cinematic/narrative cards. Logged as story beats so the classifier's
+      // features (decisions + mini-games) stay unchanged; the nodeId says which.
+      if (node.type === "titlecard") {
+        await logger.log("story_shown", node.id, {});
+        await playTitleCard(this, node);
+        await logger.log("story_advanced", node.id, {});
+      } else if (node.type === "character") {
+        await logger.log("story_shown", node.id, { historicity: node.historicity });
+        await playCharacter(this, node);
+        await logger.log("story_advanced", node.id, {});
+      } else if (node.type === "didyouknow") {
+        await logger.log("story_shown", node.id, {});
+        await playDidYouKnow(this, node);
+        await logger.log("story_advanced", node.id, {});
+      } else if (node.type === "story") {
         await logger.log("story_shown", node.id, {});
         await playStory(this, node);
         await logger.log("story_advanced", node.id, {});

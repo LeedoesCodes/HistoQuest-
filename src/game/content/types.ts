@@ -43,7 +43,45 @@ export interface QuizResult {
   answers: Record<string, string>; // questionId -> chosen choiceId
 }
 
-export type ArcNode = StoryNode | DecisionNode | MiniGameNode;
+export type ArcNode =
+  | TitleCardNode
+  | CharacterNode
+  | StoryNode
+  | DecisionNode
+  | MiniGameNode
+  | DidYouKnowNode;
+
+/** Cinematic opening card: place, year, and the "dramatised" note. */
+export interface TitleCardNode {
+  id: string;
+  type: "titlecard";
+  place: LocalizedText;
+  year: string;
+}
+
+/**
+ * Character introduction card. `historicity` is shown as a visible tag so
+ * pupils always know which people really existed and which were created for
+ * the story — a continuous, teachable alternative to one skippable disclaimer.
+ */
+export interface CharacterNode {
+  id: string;
+  type: "character";
+  name: LocalizedText;
+  role: LocalizedText;
+  historicity: "real" | "fictional";
+  /** Background / goal beats, revealed one after another. */
+  lines: LocalizedText[];
+  image?: string;
+}
+
+/** Closing card separating what is documented from what was dramatised. */
+export interface DidYouKnowNode {
+  id: string;
+  type: "didyouknow";
+  real: LocalizedText[];
+  invented: LocalizedText[];
+}
 
 /** A narrated story beat: text, optional illustration, optional voiceover. */
 export interface StoryNode {
@@ -74,6 +112,8 @@ export interface DecisionNode {
 export interface DecisionChoice {
   id: string;
   label: LocalizedText;
+  /** Short in-character reply shown after picking — makes the choice felt. */
+  response?: LocalizedText;
   /** Optional: which mini-game this choice routes into (future). */
   routeTo?: string;
 }

@@ -84,12 +84,41 @@ export function playDecision(scene: Phaser.Scene, node: DecisionNode): Promise<D
       btn.on("pointerover", () => btn.setFillStyle(COLORS.panelHover));
       btn.on("pointerout", () => btn.setFillStyle(COLORS.panel));
       btn.on("pointerdown", () => {
+        if (done) return;
         sfx.tap();
         pop(scene, btn);
-        scene.time.delayedCall(90, () => finish(choice.id, false));
+        // Show the in-character reply so the choice registers as meaningful,
+        // then continue. Every path still converges on the same history.
+        if (choice.response) {
+          showResponse(L(choice.response), () => finish(choice.id, false));
+        } else {
+          scene.time.delayedCall(90, () => finish(choice.id, false));
+        }
       });
       layer.add([btn, label]);
     });
+
+    /** Brief in-character reply after a choice, then continue. */
+    function showResponse(text: string, then: () => void) {
+      barTween.stop();
+      tick.remove();
+      timeout.remove();
+      layer.removeAll(true);
+      const reply = scene.add
+        .text(scene.scale.width / 2, 250, `“${text}”`, {
+          fontFamily: FONT,
+          fontSize: "22px",
+          color: COLORS.accentText,
+          align: "center",
+          wordWrap: { width: scene.scale.width - 120 },
+          lineSpacing: 6,
+        })
+        .setOrigin(0.5)
+        .setAlpha(0);
+      layer.add(reply);
+      scene.tweens.add({ targets: reply, alpha: 1, duration: 260 });
+      scene.time.delayedCall(1500, then);
+    }
 
     function finish(choiceId: string, timedOut: boolean) {
       if (done) return;
