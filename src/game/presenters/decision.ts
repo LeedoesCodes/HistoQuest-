@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import type { DecisionNode, DecisionResult } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
+import { pop } from "../ui/juice";
+import { sfx } from "../ui/sfx";
 
 /**
  * Reusable timed-decision presenter. Shows a prompt, a shrinking countdown
@@ -80,7 +82,11 @@ export function playDecision(scene: Phaser.Scene, node: DecisionNode): Promise<D
 
       btn.on("pointerover", () => btn.setFillStyle(COLORS.panelHover));
       btn.on("pointerout", () => btn.setFillStyle(COLORS.panel));
-      btn.on("pointerdown", () => finish(choice.id, false));
+      btn.on("pointerdown", () => {
+        sfx.tap();
+        pop(scene, btn);
+        scene.time.delayedCall(90, () => finish(choice.id, false));
+      });
       layer.add([btn, label]);
     });
 

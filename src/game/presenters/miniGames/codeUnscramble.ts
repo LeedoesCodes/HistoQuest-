@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import type { MiniGameNode, MiniGameResult } from "../../content/types";
 import { COLORS, FONT } from "../../ui/theme";
+import { burst, shake } from "../../ui/juice";
+import { sfx } from "../../ui/sfx";
 
 /**
  * Code-unscramble mini-game (Pugad Lawin arc).
@@ -139,6 +141,7 @@ export function playCodeUnscramble(
         tile.on("pointerout", () => tile.setFillStyle(COLORS.panel));
         tile.on("pointerdown", () => {
           if (locked) return;
+          sfx.pop();
           pool.splice(pool.indexOf(id), 1);
           answer.push(id);
           feedback.setText("");
@@ -157,6 +160,8 @@ export function playCodeUnscramble(
       } else {
         attempts++;
         locked = true;
+        sfx.error();
+        shake(scene, 160, 0.005);
         feedback.setColor("#e4572e").setText("Mali ang code! Subukan mong muli.");
         scene.time.delayedCall(900, () => {
           // return everything to the pool and let them retry
@@ -172,6 +177,8 @@ export function playCodeUnscramble(
       done = true;
       attempts++;
       locked = true;
+      sfx.success();
+      burst(scene, width / 2, height / 2, [0xffd54a, 0xffffff, 0x8bc34a], 28, 240);
       layer.destroy(true);
       staticLayer.destroy(true);
 

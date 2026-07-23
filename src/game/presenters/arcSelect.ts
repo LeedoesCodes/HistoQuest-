@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import type { ArcId } from "@shared/types";
 import { COLORS, FONT } from "../ui/theme";
+import { pop } from "../ui/juice";
+import { sfx } from "../ui/sfx";
 
 const ARCS: { id: ArcId; title: string; subtitle: string }[] = [
   { id: "mactan", title: "Labanan sa Mactan", subtitle: "Lapu-Lapu, 1521" },
@@ -63,9 +65,13 @@ export function playArcSelect(scene: Phaser.Scene): Promise<ArcId> {
       card.on("pointerover", () => card.setFillStyle(COLORS.panelHover));
       card.on("pointerout", () => card.setFillStyle(COLORS.panel));
       card.on("pointerdown", () => {
+        sfx.tap();
+        pop(scene, card);
         scene.game.events.emit("arc-selected", arc.id);
-        layer.destroy(true);
-        resolve(arc.id);
+        scene.time.delayedCall(140, () => {
+          layer.destroy(true);
+          resolve(arc.id);
+        });
       });
 
       layer.add([card, title, sub]);

@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import type { MiniGameNode, MiniGameResult } from "../../content/types";
 import { COLORS, FONT } from "../../ui/theme";
+import { burst, shake } from "../../ui/juice";
+import { sfx } from "../../ui/sfx";
 
 /**
  * Cedula-tear mini-game (Pugad Lawin arc).
@@ -95,6 +97,8 @@ export function playCedulaTear(scene: Phaser.Scene, _node: MiniGameNode): Promis
     }
 
     function fail() {
+      sfx.error();
+      shake(scene, 90, 0.002);
       hint.setText("Mas mahaba at pahalang na hila!");
       scene.tweens.add({
         targets: paper,
@@ -115,10 +119,19 @@ export function playCedulaTear(scene: Phaser.Scene, _node: MiniGameNode): Promis
       instr.setText("");
 
       // Split the paper at the tear line into a top and bottom half.
+      // Impact: rip sound, shake, and a spray of paper scraps along the tear.
+      sfx.tear();
+      shake(scene, 220, 0.006);
+
       const relY = Phaser.Math.Clamp(tearWorldY - (cy - ph / 2), 30, ph - 30);
       const topH = relY;
       const botH = ph - relY;
       paperParts.forEach((o) => o.setVisible(false));
+
+      const tearY = cy - ph / 2 + relY;
+      burst(scene, cx, tearY, [0xf5eecd, 0xcbb98a, 0x8a6d3b], 26, 220);
+      scene.time.delayedCall(90, () => burst(scene, cx - 90, tearY, 0xf5eecd, 10, 150));
+      scene.time.delayedCall(160, () => burst(scene, cx + 90, tearY, 0xf5eecd, 10, 150));
 
       const top = scene.add
         .rectangle(cx, cy - ph / 2 + topH / 2, pw, topH, 0xf5eecd)
@@ -132,6 +145,7 @@ export function playCedulaTear(scene: Phaser.Scene, _node: MiniGameNode): Promis
       scene.tweens.add({ targets: bottom, x: cx + 170, y: cy + 190, angle: 42, alpha: 0, duration: 650, ease: "Cubic.easeIn" });
 
       scene.time.delayedCall(680, () => {
+        sfx.success();
         const msg = scene.add
           .text(cx, cy - 16, "Napunit mo ang cedula!", {
             fontFamily: FONT,

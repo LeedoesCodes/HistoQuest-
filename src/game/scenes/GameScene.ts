@@ -10,6 +10,8 @@ import { playDecision } from "../presenters/decision";
 import { playQuiz } from "../presenters/quiz";
 import { getMiniGame } from "../presenters/miniGames";
 import { COLORS, FONT } from "../ui/theme";
+import { burst, pop } from "../ui/juice";
+import { sfx } from "../ui/sfx";
 
 /**
  * GameScene — the ONLY scene. Everything (arc select, story, decisions,
@@ -183,9 +185,19 @@ export class GameScene extends Phaser.Scene {
           .setOrigin(0.5),
       ]);
 
+      // Celebrate an improvement from pre-test to post-test.
+      if (gain > 0) {
+        sfx.success();
+        this.time.delayedCall(220, () => burst(this, width / 2, height / 2 - 30, [0xffd54a, 0x8bc34a, 0xffffff], 34, 260));
+      }
+
       btn.on("pointerdown", () => {
-        layer.destroy(true);
-        resolve();
+        sfx.tap();
+        pop(this, btn);
+        this.time.delayedCall(120, () => {
+          layer.destroy(true);
+          resolve();
+        });
       });
     });
   }

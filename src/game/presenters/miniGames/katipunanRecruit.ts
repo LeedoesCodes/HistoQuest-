@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import type { MiniGameNode, MiniGameResult } from "../../content/types";
 import { COLORS, FONT } from "../../ui/theme";
+import { burst, shake, floatText, pop } from "../../ui/juice";
+import { sfx } from "../../ui/sfx";
 
 /**
  * Katipunan recruitment mini-game (Pugad Lawin arc).
@@ -113,26 +115,24 @@ export function playKatipunanRecruit(
         if (isFilipino) {
           recruited++;
           counter.setText(`Nakuha: ${recruited}/${TARGET}`);
-          floatPlus(x, y, "+1", COLORS.accentText);
+          sfx.hit();
+          burst(scene, x, y, [0x8bc34a, 0xffd54a], 12, 150);
+          floatText(scene, x, y - 30, "+1", "#ffd54a");
+          pop(scene, counter);
           removeFigure(c);
           if (recruited >= TARGET) finish();
         } else {
           misses++;
-          floatPlus(x, y, "✗", "#e4572e");
+          sfx.error();
+          shake(scene, 120, 0.004);
+          burst(scene, x, y, 0xe4572e, 10, 130);
+          floatText(scene, x, y - 30, "✗", "#e4572e");
           removeFigure(c);
         }
       });
 
       figures.add(c);
       active.add(c);
-    }
-
-    function floatPlus(x: number, y: number, txt: string, color: string) {
-      const t = scene.add
-        .text(x, y - 30, txt, { fontFamily: FONT, fontSize: "22px", color, fontStyle: "bold" })
-        .setOrigin(0.5)
-        .setDepth(13);
-      scene.tweens.add({ targets: t, y: y - 70, alpha: 0, duration: 600, onComplete: () => t.destroy() });
     }
 
     function removeFigure(c: Phaser.GameObjects.Container) {
@@ -165,6 +165,10 @@ export function playKatipunanRecruit(
       active.clear();
 
       const score = Math.min(recruited / TARGET, 1);
+      if (recruited >= TARGET) {
+        sfx.success();
+        burst(scene, width / 2, height / 2, [0x8bc34a, 0xffd54a], 30, 260);
+      }
       hud.removeAll(true);
       const resultLayer = scene.add.container(0, 0).setDepth(13);
       resultLayer.add([

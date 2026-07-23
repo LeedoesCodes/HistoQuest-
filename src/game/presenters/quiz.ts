@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import type { AssessmentPhase, QuizQuestion, QuizResult } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
+import { pop } from "../ui/juice";
+import { sfx } from "../ui/sfx";
 
 const PHASE_TITLE: Record<AssessmentPhase, string> = {
   pre: "Panimulang Pagsusulit",
@@ -100,10 +102,15 @@ export function playQuiz(
         btn.on("pointerover", () => btn.setFillStyle(COLORS.panelHover));
         btn.on("pointerout", () => btn.setFillStyle(COLORS.panel));
         btn.on("pointerdown", () => {
+          sfx.tap();
+          pop(scene, btn);
           answers[q.id] = choice.id;
           index++;
-          if (index < questions.length) renderQuestion();
-          else finish();
+          // Brief beat so the tap registers visually before the screen changes.
+          scene.time.delayedCall(110, () => {
+            if (index < questions.length) renderQuestion();
+            else finish();
+          });
         });
         layer.add([btn, label]);
       });

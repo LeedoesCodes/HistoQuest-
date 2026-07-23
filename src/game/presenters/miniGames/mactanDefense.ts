@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import type { MiniGameNode, MiniGameResult } from "../../content/types";
 import { COLORS, FONT } from "../../ui/theme";
+import { burst, shake, flash, floatText, pop } from "../../ui/juice";
+import { sfx } from "../../ui/sfx";
 
 /**
  * Mactan defense mini-game (Mactan arc).
@@ -71,14 +73,6 @@ export function playMactanDefense(
       counter.setText(`Naitaboy: ${repelled}   Nakalusot: ${breached}   (${spawned}/${TOTAL_INVADERS})`);
     updateHud();
 
-    function floatText(x: number, y: number, txt: string, color: string) {
-      const t = scene.add
-        .text(x, y, txt, { fontFamily: FONT, fontSize: "20px", color, fontStyle: "bold" })
-        .setOrigin(0.5)
-        .setDepth(13);
-      scene.tweens.add({ targets: t, y: y - 50, alpha: 0, duration: 550, onComplete: () => t.destroy() });
-    }
-
     function removeInvader(c: Phaser.GameObjects.Container) {
       if (!active.has(c)) return;
       active.delete(c);
@@ -114,7 +108,11 @@ export function playMactanDefense(
         onComplete: () => {
           if (done || !active.has(c)) return;
           breached++;
-          floatText(SHORE_X + 40, c.y, "✗", "#e4572e");
+          sfx.thud();
+          flash(scene, 0xe4572e, 160);
+          shake(scene, 200, 0.007);
+          burst(scene, SHORE_X + 20, c.y, 0xe4572e, 14, 160);
+          floatText(scene, SHORE_X + 50, c.y, "✗", "#e4572e");
           updateHud();
           removeInvader(c);
         },
@@ -124,7 +122,11 @@ export function playMactanDefense(
       hit.on("pointerdown", () => {
         if (done || !active.has(c)) return;
         repelled++;
-        floatText(c.x, c.y - 20, "✓", "#8bc34a");
+        sfx.hit();
+        shake(scene, 80, 0.003);
+        burst(scene, c.x, c.y, [0x8bc34a, 0xffffff, 0x4fc3f7], 14, 190);
+        floatText(scene, c.x, c.y - 24, "✓", "#8bc34a");
+        pop(scene, counter);
         updateHud();
         // knock the boat back out to sea before removing it
         (c.getData("tween") as Phaser.Tweens.Tween).stop();
@@ -174,6 +176,10 @@ export function playMactanDefense(
       active.clear();
 
       const score = repelled / TOTAL_INVADERS;
+      if (breached === 0) {
+        sfx.success();
+        burst(scene, width / 2, height / 2, [0x8bc34a, 0xffd54a, 0xffffff], 34, 280);
+      }
       hud.removeAll(true);
       const resultLayer = scene.add.container(0, 0).setDepth(13);
       resultLayer.add([
