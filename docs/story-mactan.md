@@ -23,6 +23,12 @@
 
 **Reading level:** short sentences, concrete images, active voice. Aim ~8–14 words per sentence.
 
+**Beat length (important):** keep each story beat to **2–4 short lines**. The panel
+sizes itself to the text, but a beat that cannot fit logs a console warning in dev
+(`[story] beat "id" is too long for one panel — split it`). Short beats also read
+better for Grade 5 and give the typewriter a satisfying rhythm — prefer three
+punchy screens over one dense one.
+
 ---
 
 ## 2. Character roster

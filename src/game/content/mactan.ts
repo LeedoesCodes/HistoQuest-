@@ -205,21 +205,31 @@ export const mactanArc: ArcContent = {
 
     // M4 — why they came
     {
-      id: "mac_s2",
+      id: "mac_s2a",
       type: "story",
       text: {
         fil:
           "Malayo ang pinanggalingan nila — mga buwan ang layo.\n" +
           "Naghahanap sila ng pampalasa: klabo, kanela, paminta.\n" +
-          "Sa kanilang lupain, kasinghalaga ito ng ginto.\n" +
-          "Ngunit hindi lang pampalasa ang hinahanap nila. Gusto rin nilang " +
-          "tawaging kanila ang mga pulo — at ang mga tao rito.",
+          "Sa kanilang lupain, kasinghalaga ito ng ginto.",
         en:
           "They came from far away — months of sailing.\n" +
           "They were looking for spices: cloves, cinnamon, pepper.\n" +
-          "In their land, those were worth as much as gold.\n" +
-          "But spices were not all they wanted. They also wanted to call these " +
-          "islands theirs — and the people in them.",
+          "In their land, those were worth as much as gold.",
+      },
+    },
+    {
+      id: "mac_s2b",
+      type: "story",
+      text: {
+        fil:
+          "Ngunit hindi lang pampalasa ang hinahanap nila.\n" +
+          "Gusto rin nilang tawaging kanila ang mga pulo —\n" +
+          "at ang mga tao rito.",
+        en:
+          "But spices were not all they wanted.\n" +
+          "They also wanted to call these islands theirs —\n" +
+          "and the people in them.",
       },
     },
 
@@ -248,18 +258,26 @@ export const mactanArc: ArcContent = {
 
     // M6 — Humabon's choice
     {
-      id: "mac_s3",
+      id: "mac_s3a",
       type: "story",
       text: {
         fil:
           "Sa kabilang pulo, sa Cebu, may pinuno — si Rajah Humabon.\n" +
-          "Nakipagkasundo siya sa mga dayuhan. Nagpabinyag siya.\n" +
+          "Nakipagkasundo siya sa mga dayuhan. Nagpabinyag siya.",
+        en:
+          "On the other island, in Cebu, there was a leader — Rajah Humabon.\n" +
+          "He made peace with the strangers. He was baptised.",
+      },
+    },
+    {
+      id: "mac_s3b",
+      type: "story",
+      text: {
+        fil:
           "Para sa kaniya, kaligtasan at kalakalan ang tama.\n" +
           "Hindi siya duwag. Iba lang ang napili niyang daan.\n" +
           "Sa Mactan, iba ang pasya.",
         en:
-          "On the other island, in Cebu, there was a leader — Rajah Humabon.\n" +
-          "He made peace with the strangers. He was baptised.\n" +
           "For him, safety and trade were the right choice.\n" +
           "He was not a coward. He simply chose a different road.\n" +
           "In Mactan, the answer was different.",
@@ -268,41 +286,85 @@ export const mactanArc: ArcContent = {
 
     // M7 — the demand
     {
-      id: "mac_s4",
+      id: "mac_s4a",
       type: "story",
       text: {
         fil:
           "Dumating ang mensahe sa Mactan.\n" +
-          "Magbigay ng pagkain. Magbayad ng buwis. Kilalanin ang hari sa malayo.\n" +
-          "Tumayo si Lapu-Lapu sa harap ng mga tao.\n" +
-          "“Hindi kami tumatanggi sa panauhin,” sabi niya. “Tumatanggi kami sa panginoon.”\n" +
-          "Ramdam mo ang kilabot sa iyong batok. Wala nang aatras.",
+          "Magbigay ng pagkain. Magbayad ng buwis.\n" +
+          "Kilalanin ang hari sa malayo.",
         en:
           "The message reached Mactan.\n" +
-          "Give food. Pay tribute. Bow to a king across the sea.\n" +
+          "Give food. Pay tribute.\n" +
+          "Bow to a king across the sea.",
+      },
+    },
+    {
+      id: "mac_s4b",
+      type: "story",
+      text: {
+        fil:
+          "Tumayo si Lapu-Lapu sa harap ng mga tao.\n" +
+          "“Hindi kami tumatanggi sa panauhin,” sabi niya.\n" +
+          "“Tumatanggi kami sa panginoon.”",
+        en:
           "Lapu-Lapu stood before his people.\n" +
-          "“We do not refuse a guest,” he said. “We refuse a master.”\n" +
-          "You felt a chill on your neck. No one was turning back now.",
+          "“We do not refuse a guest,” he said.\n" +
+          "“We refuse a master.”",
+      },
+    },
+    {
+      id: "mac_s4c",
+      type: "story",
+      text: {
+        fil:
+          "Ramdam mo ang kilabot sa iyong batok.\n" +
+          "Wala nang aatras.",
+        en:
+          "You felt a chill on your neck.\n" +
+          "No one was turning back now.",
       },
     },
 
     // M8 — the plan (teachable core)
     {
-      id: "mac_s5",
+      id: "mac_s5a",
       type: "story",
       text: {
         fil:
           "Ngunit hindi lakas ang plano ni Lapu-Lapu. Talino.\n" +
-          "“Mabigat ang kanilang barko,” sabi niya. “Mababaw ang ating tubig.”\n" +
-          "“Hindi sila makakalapit. Kailangan nilang maglakad sa dagat.”\n" +
-          "Napatingin siya sa iyo. “Batang mandaragat — kabisado mo ang bahura, hindi ba?”\n" +
-          "Tumango ka. Sa unang pagkakataon, hindi ka masyadong maliit.",
+          "“Mabigat ang kanilang barko,” sabi niya.\n" +
+          "“Mababaw ang ating tubig.”",
         en:
           "But Lapu-Lapu's plan was not strength. It was cleverness.\n" +
-          "“Their ships are heavy,” he said. “Our water is shallow.”\n" +
+          "“Their ships are heavy,” he said.\n" +
+          "“Our water is shallow.”",
+      },
+    },
+    {
+      id: "mac_s5b",
+      type: "story",
+      text: {
+        fil:
+          "“Hindi sila makakalapit. Kailangan nilang maglakad sa dagat.”\n" +
+          "Napatingin siya sa iyo.\n" +
+          "“Batang mandaragat — kabisado mo ang bahura, hindi ba?”",
+        en:
           "“They cannot come close. They will have to walk through the sea.”\n" +
-          "He looked at you. “Young seafarer — you know the reef, don't you?”\n" +
-          "You nodded. For the first time, you were not too small.",
+          "He looked at you.\n" +
+          "“Young seafarer — you know the reef, don't you?”",
+      },
+    },
+    {
+      id: "mac_s5c",
+      type: "story",
+      text: {
+        fil:
+          "Tumango ka.\n" +
+          "Sa unang pagkakataon, hindi ka masyadong maliit.",
+        en:
+          "You nodded.\n" +
+          "For the first time, you were not too small.",
       },
     },
 
@@ -351,19 +413,29 @@ export const mactanArc: ArcContent = {
 
     // M11 — the tide turns
     {
-      id: "mac_s6",
+      id: "mac_s6a",
       type: "story",
       text: {
         fil:
           "Nangyari ang sinabi ni Lapu-Lapu.\n" +
-          "Sumadsad ang malalaking bangka sa bato.\n" +
-          "Kinailangang lumusong ng mga kawal — mabigat ang baluti, malalim ang putik.\n" +
+          "Sumadsad ang malalaking bangka sa bato.",
+        en:
+          "What Lapu-Lapu said came true.\n" +
+          "The big boats struck the coral.",
+      },
+    },
+    {
+      id: "mac_s6b",
+      type: "story",
+      text: {
+        fil:
+          "Kinailangang lumusong ng mga kawal —\n" +
+          "mabigat ang baluti, malalim ang putik.\n" +
           "Ang kanilang kanyon ay masyadong malayo para makatulong.\n" +
           "Mabagal sila. Kayo ay hindi.",
         en:
-          "What Lapu-Lapu said came true.\n" +
-          "The big boats struck the coral.\n" +
-          "The soldiers had to wade in — heavy armour, deep mud.\n" +
+          "The soldiers had to wade in —\n" +
+          "heavy armour, deep mud.\n" +
           "Their cannons were too far away to help.\n" +
           "They were slow. You were not.",
       },
@@ -371,21 +443,45 @@ export const mactanArc: ArcContent = {
 
     // M12 — aftermath
     {
-      id: "mac_s7",
+      id: "mac_s7a",
       type: "story",
       text: {
         fil:
           "Hindi nakalapag ang mga dayuhan.\n" +
-          "Sa mababaw na tubig ng Mactan, natalo ang kanilang hukbo. Doon din nasawi si Magellan.\n" +
-          "Si Lapu-Lapu ang naging unang pinunong Pilipino na matagumpay na lumaban sa mga dayuhang mananakop.\n" +
-          "Hindi dahil mas marami sila — kundi dahil kilala nila ang sarili nilang dagat.\n" +
-          "At ikaw, ang batang kabisado ang bahura, naroon ka.",
+          "Sa mababaw na tubig ng Mactan, natalo ang kanilang hukbo.\n" +
+          "Doon din nasawi si Magellan.",
         en:
           "The strangers never landed.\n" +
-          "In the shallow water of Mactan their force was beaten. Magellan fell there too.\n" +
-          "Lapu-Lapu became the first Filipino leader to successfully resist foreign invaders.\n" +
-          "Not because they had more men — but because they knew their own sea.\n" +
-          "And you, the child who knew the reef, you were there.",
+          "In the shallow water of Mactan their force was beaten.\n" +
+          "Magellan fell there too.",
+      },
+    },
+    {
+      id: "mac_s7b",
+      type: "story",
+      text: {
+        fil:
+          "Si Lapu-Lapu ang naging unang pinunong Pilipino\n" +
+          "na matagumpay na lumaban sa mga dayuhang mananakop.\n" +
+          "Hindi dahil mas marami sila —\n" +
+          "kundi dahil kilala nila ang sarili nilang dagat.",
+        en:
+          "Lapu-Lapu became the first Filipino leader\n" +
+          "to successfully resist foreign invaders.\n" +
+          "Not because they had more men —\n" +
+          "but because they knew their own sea.",
+      },
+    },
+    {
+      id: "mac_s7c",
+      type: "story",
+      text: {
+        fil:
+          "At ikaw, ang batang kabisado ang bahura,\n" +
+          "naroon ka.",
+        en:
+          "And you, the child who knew the reef,\n" +
+          "you were there.",
       },
     },
 

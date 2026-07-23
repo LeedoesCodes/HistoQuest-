@@ -107,4 +107,9 @@ export const sfx = {
   thud: () => tone(90, 0.28, "sine", 0.07),
   /** Tearing the cedula. */
   tear: () => noise(0.32, 0.08, 900),
+  /**
+   * One character of typewriter text. Deliberately tiny and quiet — it plays
+   * many times per line, so anything louder becomes irritating fast.
+   */
+  type: () => tone(1500 + Math.random() * 260, 0.015, "square", 0.012),
 };

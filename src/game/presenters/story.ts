@@ -2,69 +2,128 @@ import Phaser from "phaser";
 import type { StoryNode } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
 import { L, t } from "../i18n";
+import { sfx } from "../ui/sfx";
 
 /**
- * Reusable story presenter — a narrated beat shown in a bottom text panel,
- * with an optional illustration behind it. Resolves when the pupil advances
- * (click / tap / Space / Enter). Used by all three arcs.
+ * Reusable story presenter — a narrated beat in a bottom text panel.
  *
- * Later: draw `node.image` and play `node.vo` audio here — the call sites and
- * the returned Promise stay the same.
+ * Two things worth knowing:
+ *
+ * 1. The panel is sized to its text. It used to be a fixed 190px, which made
+ *    longer beats spill out of the box and collide with the hint.
+ *
+ * 2. The text types itself in. To avoid words visibly jumping as they wrap, we
+ *    pre-wrap the whole string first (getWrappedText) and then reveal
+ *    characters of the ALREADY-wrapped result — so the layout never reflows
+ *    mid-animation. Tapping once completes the line instantly; tapping again
+ *    advances. Impatient readers are never forced to wait.
  */
+
+const CHARS_PER_TICK = 2; // ~125 chars/sec at 60fps — fast, per Lee's preference
+const TICK_MS = 16;
+const SOUND_EVERY = 3; // play the tick sound every N characters, not every one
+
+const PADDING_X = 24;
+const PADDING_TOP = 20;
+const HINT_ROW = 30; // reserved strip at the panel bottom for the hint
+
 export function playStory(scene: Phaser.Scene, node: StoryNode): Promise<void> {
   return new Promise((resolve) => {
     const { width, height } = scene.scale;
     const layer = scene.add.container(0, 0).setDepth(10);
+    const full = L(node.text);
 
-    const boxH = 190;
-    const boxY = height - boxH / 2 - 20;
+    const style: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: FONT,
+      fontSize: "20px",
+      color: COLORS.text,
+      wordWrap: { width: width - 40 - PADDING_X * 2 },
+      lineSpacing: 6,
+    };
 
+    // Measure first: build the text, pre-wrap it, and size the panel to fit.
+    const text = scene.add.text(0, 0, full, style).setOrigin(0, 0);
+    const wrapped = text.getWrappedText(full).join("\n");
+    text.setText(wrapped);
+    const textHeight = text.height;
+
+    const maxPanelH = height - 150;
+    const panelH = Math.min(maxPanelH, textHeight + PADDING_TOP + HINT_ROW + 12);
+    if (import.meta.env.DEV && textHeight + PADDING_TOP + HINT_ROW + 12 > maxPanelH) {
+      console.warn(`[story] beat "${node.id}" is too long for one panel — split it.`);
+    }
+
+    const panelY = height - panelH / 2 - 20;
     const box = scene.add
-      .rectangle(width / 2, boxY, width - 40, boxH, COLORS.panel, 0.96)
+      .rectangle(width / 2, panelY, width - 40, panelH, COLORS.panel, 0.96)
       .setStrokeStyle(2, COLORS.panelStroke);
 
-    const text = scene.add
-      .text(40, boxY - boxH / 2 + 22, L(node.text), {
-        fontFamily: FONT,
-        fontSize: "20px",
-        color: COLORS.text,
-        wordWrap: { width: width - 100 },
-        lineSpacing: 6,
-      })
-      .setOrigin(0, 0);
+    text.setPosition(20 + PADDING_X, panelY - panelH / 2 + PADDING_TOP);
+    text.setText(""); // start empty; the typewriter fills it
 
     const hint = scene.add
-      .text(width - 50, boxY + boxH / 2 - 22, t("story.continue"), {
+      .text(width - 20 - PADDING_X, panelY + panelH / 2 - HINT_ROW / 2, t("story.continue"), {
         fontFamily: FONT,
         fontSize: "14px",
         color: COLORS.textMuted,
       })
-      .setOrigin(1, 0.5);
-
-    // Gentle blink on the hint so kids know to tap.
-    const blink = scene.tweens.add({
-      targets: hint,
-      alpha: 0.35,
-      duration: 700,
-      yoyo: true,
-      repeat: -1,
-    });
+      .setOrigin(1, 0.5)
+      .setAlpha(0);
 
     layer.add([box, text, hint]);
 
-    const cleanup = () => {
-      blink.stop();
-      scene.input.keyboard?.off("keydown-SPACE", advance);
-      scene.input.keyboard?.off("keydown-ENTER", advance);
-      layer.destroy(true);
+    // --- Typewriter ---
+    let revealed = 0;
+    let complete = false;
+    let blink: Phaser.Tweens.Tween | null = null;
+
+    const finishTyping = () => {
+      if (complete) return;
+      complete = true;
+      typer.remove();
+      text.setText(wrapped);
+      hint.setAlpha(1);
+      blink = scene.tweens.add({
+        targets: hint,
+        alpha: 0.35,
+        duration: 700,
+        yoyo: true,
+        repeat: -1,
+      });
     };
-    const advance = () => {
+
+    const typer = scene.time.addEvent({
+      delay: TICK_MS,
+      loop: true,
+      callback: () => {
+        revealed = Math.min(wrapped.length, revealed + CHARS_PER_TICK);
+        text.setText(wrapped.slice(0, revealed));
+        if (revealed % (SOUND_EVERY * CHARS_PER_TICK) === 0) sfx.type();
+        if (revealed >= wrapped.length) finishTyping();
+      },
+    });
+
+    // --- Input: first tap skips the animation, second advances ---
+    const onInput = () => {
+      if (!complete) {
+        finishTyping();
+        return;
+      }
       cleanup();
       resolve();
     };
 
-    scene.input.once("pointerdown", advance);
-    scene.input.keyboard?.once("keydown-SPACE", advance);
-    scene.input.keyboard?.once("keydown-ENTER", advance);
+    const cleanup = () => {
+      typer.remove();
+      blink?.stop();
+      scene.input.off("pointerdown", onInput);
+      scene.input.keyboard?.off("keydown-SPACE", onInput);
+      scene.input.keyboard?.off("keydown-ENTER", onInput);
+      layer.destroy(true);
+    };
+
+    scene.input.on("pointerdown", onInput);
+    scene.input.keyboard?.on("keydown-SPACE", onInput);
+    scene.input.keyboard?.on("keydown-ENTER", onInput);
   });
 }
