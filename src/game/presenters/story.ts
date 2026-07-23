@@ -21,7 +21,13 @@ import { sfx } from "../ui/sfx";
 
 const CHARS_PER_TICK = 2; // ~125 chars/sec at 60fps — fast, per Lee's preference
 const TICK_MS = 16;
-const SOUND_EVERY = 3; // play the tick sound every N characters, not every one
+/**
+ * Characters between key sounds. Text reveals far faster than anyone can type,
+ * so we deliberately DON'T play a press per character — that machine-guns. This
+ * range lands roughly 10–15 presses/sec, about the cadence of fast real typing.
+ */
+const SOUND_GAP_MIN = 8;
+const SOUND_GAP_MAX = 13;
 
 const PADDING_X = 24;
 const PADDING_TOP = 20;
@@ -92,13 +98,29 @@ export function playStory(scene: Phaser.Scene, node: StoryNode): Promise<void> {
       });
     };
 
+    const nextGap = () =>
+      SOUND_GAP_MIN + Math.floor(Math.random() * (SOUND_GAP_MAX - SOUND_GAP_MIN + 1));
+    let sinceSound = 0;
+    let soundGap = nextGap();
+
     const typer = scene.time.addEvent({
       delay: TICK_MS,
       loop: true,
       callback: () => {
+        const from = revealed;
         revealed = Math.min(wrapped.length, revealed + CHARS_PER_TICK);
+        const chunk = wrapped.slice(from, revealed);
         text.setText(wrapped.slice(0, revealed));
-        if (revealed % (SOUND_EVERY * CHARS_PER_TICK) === 0) sfx.type();
+
+        sinceSound += chunk.length;
+        if (sinceSound >= soundGap) {
+          sinceSound = 0;
+          soundGap = nextGap();
+          // A word gap gets the deeper spacebar; everything else a letter key.
+          if (/[ \n]/.test(chunk)) sfx.keySpace();
+          else sfx.key();
+        }
+
         if (revealed >= wrapped.length) finishTyping();
       },
     });
