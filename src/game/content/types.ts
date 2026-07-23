@@ -11,14 +11,36 @@ import type { ArcId, LocalizedText } from "@shared/types";
 export interface ArcContent {
   arc: ArcId;
   title: LocalizedText;
-  /**
-   * Auto-scored multiple-choice questions on this arc's history. The SAME set
-   * is asked before the arc (baseline) and after (retention), so post − pre is
-   * the learning gain the study measures. Keep it short (3–5) for Grade 5.
-   */
-  assessment: QuizQuestion[];
+  /** Item bank the pre-test and post-test forms are drawn from. */
+  assessment: AssessmentBank;
   /** Played top to bottom. Every decision path converges back onto this line. */
   nodes: ArcNode[];
+}
+
+/**
+ * Item bank organised by learning objective.
+ *
+ * Why not one fixed question list: pupils replay arcs, so a fixed pre/post set
+ * gets memorised and the "gain" stops measuring learning. But freely random
+ * questions break the comparison — pre and post must be equivalent in coverage
+ * and difficulty or the gain measures item difficulty instead.
+ *
+ * The fix used here is PARALLEL FORMS: every objective carries >= 2 items of
+ * matched difficulty; the pre-test takes one and the post-test takes another.
+ * Coverage stays identical, the wording changes, and memorising an answer does
+ * not help. Which item lands on which form is decided by a per-session seed and
+ * logged, so a result can be reproduced and audited later.
+ */
+export interface AssessmentBank {
+  objectives: LearningObjective[];
+}
+
+export interface LearningObjective {
+  id: string;
+  /** What this objective tests — shown to teachers, not to pupils. */
+  description: LocalizedText;
+  /** Parallel items of equal difficulty. Author at least 2. */
+  items: QuizQuestion[];
 }
 
 export interface QuizQuestion {

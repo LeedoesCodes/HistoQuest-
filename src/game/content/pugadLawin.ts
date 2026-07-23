@@ -11,50 +11,122 @@ import type { ArcContent } from "./types";
 export const pugadLawinArc: ArcContent = {
   arc: "pugad_lawin",
   title: { fil: "Sigaw sa Pugad Lawin", en: "The Cry of Pugad Lawin" },
-  assessment: [
-    {
-      id: "pl_q1",
-      question: {
-        fil: "Sino ang pinuno ng Katipunan sa Sigaw sa Pugad Lawin?",
-        en: "Who led the Katipunan at the Cry of Pugad Lawin?",
+  assessment: {
+    objectives: [
+      {
+        id: "pl_obj_leader",
+        description: {
+          fil: "Nakikilala ang pinuno ng Katipunan.",
+          en: "Identifies the leader of the Katipunan.",
+        },
+        items: [
+          {
+            id: "pl_leader_a",
+            question: {
+              fil: "Sino ang pinuno ng Katipunan sa Sigaw sa Pugad Lawin?",
+              en: "Who led the Katipunan at the Cry of Pugad Lawin?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Andres Bonifacio", en: "Andres Bonifacio" } },
+              { id: "b", label: { fil: "Jose Rizal", en: "Jose Rizal" } },
+              { id: "c", label: { fil: "Emilio Aguinaldo", en: "Emilio Aguinaldo" } },
+              { id: "d", label: { fil: "Lapu-Lapu", en: "Lapu-Lapu" } },
+            ],
+            correctChoiceId: "a",
+          },
+          {
+            id: "pl_leader_b",
+            question: {
+              fil: "Sinong pinuno ang nanguna sa mga Katipunero noong 1896?",
+              en: "Which leader led the Katipuneros in 1896?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Apolinario Mabini", en: "Apolinario Mabini" } },
+              { id: "b", label: { fil: "Andres Bonifacio", en: "Andres Bonifacio" } },
+              { id: "c", label: { fil: "Marcelo del Pilar", en: "Marcelo del Pilar" } },
+              { id: "d", label: { fil: "Rajah Humabon", en: "Rajah Humabon" } },
+            ],
+            correctChoiceId: "b",
+          },
+        ],
       },
-      choices: [
-        { id: "a", label: { fil: "Andres Bonifacio", en: "Andres Bonifacio" } },
-        { id: "b", label: { fil: "Jose Rizal", en: "Jose Rizal" } },
-        { id: "c", label: { fil: "Emilio Aguinaldo", en: "Emilio Aguinaldo" } },
-        { id: "d", label: { fil: "Lapu-Lapu", en: "Lapu-Lapu" } },
-      ],
-      correctChoiceId: "a",
-    },
-    {
-      id: "pl_q2",
-      question: {
-        fil: "Ano ang ginawa ng mga Katipunero bilang tanda ng paghihimagsik?",
-        en: "What did the Katipuneros do as a sign of revolt?",
+      {
+        id: "pl_obj_cedula",
+        description: {
+          fil: "Nauunawaan ang pagpunit ng cedula bilang simbolo ng paghihimagsik.",
+          en: "Understands the tearing of the cedula as a symbol of revolt.",
+        },
+        items: [
+          {
+            id: "pl_cedula_a",
+            question: {
+              fil: "Ano ang ginawa ng mga Katipunero bilang tanda ng paghihimagsik?",
+              en: "What did the Katipuneros do as a sign of revolt?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Sinunog ang bandila", en: "Burned the flag" } },
+              { id: "b", label: { fil: "Pinunit ang kanilang cedula", en: "Tore up their cedulas" } },
+              { id: "c", label: { fil: "Nagtanim ng puno", en: "Planted a tree" } },
+              { id: "d", label: { fil: "Sumulat ng liham sa hari", en: "Wrote a letter to the king" } },
+            ],
+            correctChoiceId: "b",
+          },
+          {
+            id: "pl_cedula_b",
+            question: {
+              fil: "Ano ang cedula na pinunit ng mga Katipunero?",
+              en: "What was the cedula that the Katipuneros tore up?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Isang mapa ng Maynila", en: "A map of Manila" } },
+              { id: "b", label: { fil: "Isang sulat mula kay Rizal", en: "A letter from Rizal" } },
+              { id: "c", label: { fil: "Ang patunay ng pagsunod sa Espanya", en: "The proof of submission to Spain" } },
+              { id: "d", label: { fil: "Ang bandila ng Katipunan", en: "The flag of the Katipunan" } },
+            ],
+            correctChoiceId: "c",
+          },
+        ],
       },
-      choices: [
-        { id: "a", label: { fil: "Sinunog ang bandila", en: "Burned the flag" } },
-        { id: "b", label: { fil: "Pinunit ang kanilang cedula", en: "Tore up their cedulas" } },
-        { id: "c", label: { fil: "Nagtanim ng puno", en: "Planted a tree" } },
-        { id: "d", label: { fil: "Sumulat ng liham sa hari", en: "Wrote a letter to the king" } },
-      ],
-      correctChoiceId: "b",
-    },
-    {
-      id: "pl_q3",
-      question: {
-        fil: "Anong taon naganap ang Sigaw sa Pugad Lawin?",
-        en: "In what year did the Cry of Pugad Lawin happen?",
+      {
+        id: "pl_obj_year",
+        description: {
+          fil: "Natutukoy ang taon ng pagsisimula ng himagsikan.",
+          en: "Identifies the year the revolution began.",
+        },
+        items: [
+          {
+            id: "pl_year_a",
+            question: {
+              fil: "Anong taon naganap ang Sigaw sa Pugad Lawin?",
+              en: "In what year did the Cry of Pugad Lawin happen?",
+            },
+            choices: [
+              { id: "a", label: { fil: "1521", en: "1521" } },
+              { id: "b", label: { fil: "1872", en: "1872" } },
+              { id: "c", label: { fil: "1896", en: "1896" } },
+              { id: "d", label: { fil: "1946", en: "1946" } },
+            ],
+            correctChoiceId: "c",
+          },
+          {
+            id: "pl_year_b",
+            question: {
+              fil: "Kailan nagsimula ang himagsikan ng mga Katipunero laban sa Espanya?",
+              en: "When did the Katipuneros' revolution against Spain begin?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Noong 1896", en: "In 1896" } },
+              { id: "b", label: { fil: "Noong 1521", en: "In 1521" } },
+              { id: "c", label: { fil: "Noong 1898", en: "In 1898" } },
+              { id: "d", label: { fil: "Noong 1935", en: "In 1935" } },
+            ],
+            correctChoiceId: "a",
+          },
+        ],
       },
-      choices: [
-        { id: "a", label: { fil: "1521", en: "1521" } },
-        { id: "b", label: { fil: "1872", en: "1872" } },
-        { id: "c", label: { fil: "1896", en: "1896" } },
-        { id: "d", label: { fil: "1946", en: "1946" } },
-      ],
-      correctChoiceId: "c",
-    },
-  ],
+    ],
+  },
+
   nodes: [
     {
       id: "pl_intro_1",

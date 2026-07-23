@@ -17,7 +17,9 @@ import { L, t } from "../i18n";
 export function playQuiz(
   scene: Phaser.Scene,
   questions: QuizQuestion[],
-  phase: AssessmentPhase
+  phase: AssessmentPhase,
+  /** Arc name, shown above the pre-test so it isn't context-free. */
+  contextTitle?: string
 ): Promise<QuizResult> {
   return new Promise((resolve) => {
     const { width } = scene.scale;
@@ -27,6 +29,17 @@ export function playQuiz(
     // Header (phase + subtitle) — its own container so it survives the
     // per-question re-render but is cleaned up when the quiz ends.
     const headerLayer = scene.add.container(0, 0).setDepth(15);
+    if (contextTitle) {
+      headerLayer.add(
+        scene.add
+          .text(width / 2, 20, contextTitle, {
+            fontFamily: FONT,
+            fontSize: "14px",
+            color: COLORS.textMuted,
+          })
+          .setOrigin(0.5)
+      );
+    }
     headerLayer.add([
       scene.add
         .text(width / 2, 46, t(phase === "pre" ? "quiz.pre.title" : "quiz.post.title"), {

@@ -4,6 +4,7 @@ import { getArcContent } from "../content";
 import type { ArcContent } from "../content/types";
 import { BehaviorLogger } from "../behaviorLogger";
 import { classify } from "../classifier";
+import { buildQuizForms, hashSeed } from "../assessment";
 import { playArcSelect } from "../presenters/arcSelect";
 import { playStory } from "../presenters/story";
 import { playTitleCard } from "../presenters/titleCard";
@@ -64,24 +65,35 @@ export class GameScene extends Phaser.Scene {
 
     await logger.log("arc_start", arcId, {});
 
-    // Pre-assessment: baseline history knowledge before the arc.
-    const pre = await playQuiz(this, content.assessment, "pre");
+    // Draw parallel pre/post forms from the item bank. Seeded from the session
+    // id so the exact items a pupil saw can be reproduced from stored data.
+    const forms = buildQuizForms(content.assessment, hashSeed(logger.sessionId));
+
+    // Pre-assessment runs BEFORE any arc content (including the title card) so
+    // the baseline measures prior knowledge only. The arc name is passed for
+    // context — it was already visible on the menu, so it leaks nothing.
+    const pre = await playQuiz(this, forms.pre, "pre", L(content.title));
     await logger.log("assessment_complete", `${arcId}_pre`, {
       phase: "pre",
       score: pre.score,
       correct: pre.correct,
       total: pre.total,
+      seed: forms.seed,
+      items: forms.pre.map((q) => q.id).join(","),
     });
 
     await this.playNodes(content, logger);
 
-    // Post-assessment: same questions, measures retention (post − pre = gain).
-    const post = await playQuiz(this, content.assessment, "post");
+    // Post-assessment: DIFFERENT items covering the SAME objectives, so the
+    // gain reflects learning rather than memorising the pre-test wording.
+    const post = await playQuiz(this, forms.post, "post", L(content.title));
     await logger.log("assessment_complete", `${arcId}_post`, {
       phase: "post",
       score: post.score,
       correct: post.correct,
       total: post.total,
+      seed: forms.seed,
+      items: forms.post.map((q) => q.id).join(","),
     });
 
     await logger.log("arc_complete", arcId, {});

@@ -11,36 +11,85 @@ import { mactanArc } from "./mactan";
 const datuBagoArc: ArcContent = {
   arc: "datu_bago",
   title: { fil: "Paglaban ni Datu Bago", en: "The Resistance of Datu Bago" },
-  assessment: [
-    {
-      id: "db_q1",
-      question: {
-        fil: "Sinong pinuno ang lumaban sa mga Espanyol sa tabi ng Ilog Davao?",
-        en: "Which leader fought the Spanish along the Davao River?",
+  assessment: {
+    objectives: [
+      {
+        id: "db_obj_leader",
+        description: {
+          fil: "Nakikilala ang pinunong lumaban sa mga Espanyol sa Davao.",
+          en: "Identifies the leader who resisted the Spanish in Davao.",
+        },
+        items: [
+          {
+            id: "db_leader_a",
+            question: {
+              fil: "Sinong pinuno ang lumaban sa mga Espanyol sa tabi ng Ilog Davao?",
+              en: "Which leader fought the Spanish along the Davao River?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Datu Bago", en: "Datu Bago" } },
+              { id: "b", label: { fil: "Lapu-Lapu", en: "Lapu-Lapu" } },
+              { id: "c", label: { fil: "Sultan Kudarat", en: "Sultan Kudarat" } },
+              { id: "d", label: { fil: "Rajah Sulayman", en: "Rajah Sulayman" } },
+            ],
+            correctChoiceId: "a",
+          },
+          {
+            id: "db_leader_b",
+            question: {
+              fil: "Sino ang namuno sa paglaban sa Davao noong panahon ng mga Espanyol?",
+              en: "Who led the resistance in Davao during the Spanish period?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Andres Bonifacio", en: "Andres Bonifacio" } },
+              { id: "b", label: { fil: "Datu Bago", en: "Datu Bago" } },
+              { id: "c", label: { fil: "Rajah Humabon", en: "Rajah Humabon" } },
+              { id: "d", label: { fil: "Diego Silang", en: "Diego Silang" } },
+            ],
+            correctChoiceId: "b",
+          },
+        ],
       },
-      choices: [
-        { id: "a", label: { fil: "Datu Bago", en: "Datu Bago" } },
-        { id: "b", label: { fil: "Datu Lapu-Lapu", en: "Datu Lapu-Lapu" } },
-        { id: "c", label: { fil: "Sultan Kudarat", en: "Sultan Kudarat" } },
-        { id: "d", label: { fil: "Rajah Sulayman", en: "Rajah Sulayman" } },
-      ],
-      correctChoiceId: "a",
-    },
-    {
-      id: "db_q2",
-      question: {
-        fil: "Anong pangkat-katutubo ang pinamunuan ni Datu Bago sa paglaban?",
-        en: "Which indigenous group did Datu Bago lead in the resistance?",
+      {
+        id: "db_obj_group",
+        description: {
+          fil: "Nakikilala ang pangkat-katutubo na kasama sa paglaban.",
+          en: "Identifies the indigenous group involved in the resistance.",
+        },
+        items: [
+          {
+            id: "db_group_a",
+            question: {
+              fil: "Anong pangkat-katutubo ang pinamunuan ni Datu Bago sa paglaban?",
+              en: "Which indigenous group did Datu Bago lead in the resistance?",
+            },
+            choices: [
+              { id: "a", label: { fil: "mga Ivatan", en: "the Ivatan" } },
+              { id: "b", label: { fil: "mga Bagobo", en: "the Bagobo" } },
+              { id: "c", label: { fil: "mga Ifugao", en: "the Ifugao" } },
+              { id: "d", label: { fil: "mga Aeta", en: "the Aeta" } },
+            ],
+            correctChoiceId: "b",
+          },
+          {
+            id: "db_group_b",
+            question: {
+              fil: "Kaninong pangkat sa Davao nakipagtulungan si Datu Bago?",
+              en: "Which group in Davao worked with Datu Bago?",
+            },
+            choices: [
+              { id: "a", label: { fil: "mga Bagobo", en: "the Bagobo" } },
+              { id: "b", label: { fil: "mga Tausug", en: "the Tausug" } },
+              { id: "c", label: { fil: "mga Igorot", en: "the Igorot" } },
+              { id: "d", label: { fil: "mga Tagalog", en: "the Tagalog" } },
+            ],
+            correctChoiceId: "a",
+          },
+        ],
       },
-      choices: [
-        { id: "a", label: { fil: "mga Ivatan", en: "the Ivatan" } },
-        { id: "b", label: { fil: "mga Bagobo", en: "the Bagobo" } },
-        { id: "c", label: { fil: "mga Ifugao", en: "the Ifugao" } },
-        { id: "d", label: { fil: "mga Aeta", en: "the Aeta" } },
-      ],
-      correctChoiceId: "b",
-    },
-  ],
+    ],
+  },
+
   nodes: [
     {
       id: "db_intro_1",

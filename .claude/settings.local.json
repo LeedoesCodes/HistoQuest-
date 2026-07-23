@@ -11,7 +11,8 @@
       "Bash(jupyter nbconvert *)",
       "Bash(grep -vE \"^\\\\s*$\")",
       "Bash(rm -f ml/_verify.ipynb ml/weights.json)",
-      "Bash(python -)"
+      "Bash(python -)",
+      "Bash(python \"C:\\\\Users\\\\lee\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--projects-in-D-HistoQuest\\\\f361c733-8309-40ee-acd5-d34c9d1d266e\\\\scratchpad\\\\banks.py\")"
     ]
   }
 }

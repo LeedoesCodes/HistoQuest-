@@ -13,51 +13,123 @@ export const mactanArc: ArcContent = {
   arc: "mactan",
   title: { fil: "Labanan sa Mactan", en: "The Battle of Mactan" },
 
-  assessment: [
-    {
-      id: "mac_q1",
-      question: {
-        fil: "Sino ang natalo ni Lapu-Lapu sa Labanan sa Mactan?",
-        en: "Who did Lapu-Lapu defeat at the Battle of Mactan?",
+  // Item bank: each objective carries two parallel items of equal difficulty,
+  // so the pre-test and post-test ask different questions about the same thing.
+  assessment: {
+    objectives: [
+      {
+        id: "mac_obj_opponent",
+        description: {
+          fil: "Nakikilala kung sinong dayuhang pinuno ang natalo sa Mactan.",
+          en: "Identifies which foreign leader was defeated at Mactan.",
+        },
+        items: [
+          {
+            id: "mac_opponent_a",
+            question: {
+              fil: "Sino ang natalo ni Lapu-Lapu sa Labanan sa Mactan?",
+              en: "Who did Lapu-Lapu defeat at the Battle of Mactan?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" } },
+              { id: "b", label: { fil: "Miguel Lopez de Legazpi", en: "Miguel Lopez de Legazpi" } },
+              { id: "c", label: { fil: "Rajah Humabon", en: "Rajah Humabon" } },
+              { id: "d", label: { fil: "Andres Bonifacio", en: "Andres Bonifacio" } },
+            ],
+            correctChoiceId: "a",
+          },
+          {
+            id: "mac_opponent_b",
+            question: {
+              fil: "Sinong pinunong dayuhan ang nasawi sa Labanan sa Mactan?",
+              en: "Which foreign captain died at the Battle of Mactan?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" } },
+              { id: "b", label: { fil: "Miguel Lopez de Legazpi", en: "Miguel Lopez de Legazpi" } },
+              { id: "c", label: { fil: "Antonio Pigafetta", en: "Antonio Pigafetta" } },
+              { id: "d", label: { fil: "Rajah Humabon", en: "Rajah Humabon" } },
+            ],
+            correctChoiceId: "a",
+          },
+        ],
       },
-      choices: [
-        { id: "a", label: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" } },
-        { id: "b", label: { fil: "Miguel Lopez de Legazpi", en: "Miguel Lopez de Legazpi" } },
-        { id: "c", label: { fil: "Rajah Humabon", en: "Rajah Humabon" } },
-        { id: "d", label: { fil: "Andres Bonifacio", en: "Andres Bonifacio" } },
-      ],
-      correctChoiceId: "a",
-    },
-    {
-      id: "mac_q2",
-      question: {
-        fil: "Saan naganap ang Labanan sa Mactan?",
-        en: "Where did the Battle of Mactan take place?",
+      {
+        id: "mac_obj_place",
+        description: {
+          fil: "Natutukoy kung saan naganap ang labanan.",
+          en: "Locates where the battle took place.",
+        },
+        items: [
+          {
+            id: "mac_place_a",
+            question: {
+              fil: "Saan naganap ang Labanan sa Mactan?",
+              en: "Where did the Battle of Mactan take place?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Maynila", en: "Manila" } },
+              { id: "b", label: { fil: "Mactan, Cebu", en: "Mactan, Cebu" } },
+              { id: "c", label: { fil: "Davao", en: "Davao" } },
+              { id: "d", label: { fil: "Batangas", en: "Batangas" } },
+            ],
+            correctChoiceId: "b",
+          },
+          {
+            id: "mac_place_b",
+            question: {
+              fil: "Sa aling pulo lumaban si Lapu-Lapu sa mga dayuhan?",
+              en: "On which island did Lapu-Lapu fight the strangers?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Pulo ng Mactan", en: "The island of Mactan" } },
+              { id: "b", label: { fil: "Pulo ng Panay", en: "The island of Panay" } },
+              { id: "c", label: { fil: "Pulo ng Samar", en: "The island of Samar" } },
+              { id: "d", label: { fil: "Pulo ng Mindoro", en: "The island of Mindoro" } },
+            ],
+            correctChoiceId: "a",
+          },
+        ],
       },
-      choices: [
-        { id: "a", label: { fil: "Maynila", en: "Manila" } },
-        { id: "b", label: { fil: "Mactan, Cebu", en: "Mactan, Cebu" } },
-        { id: "c", label: { fil: "Davao", en: "Davao" } },
-        { id: "d", label: { fil: "Batangas", en: "Batangas" } },
-      ],
-      correctChoiceId: "b",
-    },
-    {
-      // Tests the arc's teachable core, not just a name/place fact.
-      id: "mac_q3",
-      question: {
-        fil: "Bakit hindi makalapit ang malalaking barko ng mga dayuhan sa Mactan?",
-        en: "Why could the strangers' big ships not come close to Mactan?",
+      {
+        id: "mac_obj_tactic",
+        description: {
+          fil: "Naipaliliwanag kung bakit nakalamang ang Mactan — ang mababaw na tubig.",
+          en: "Explains why Mactan had the advantage — the shallow water.",
+        },
+        items: [
+          {
+            id: "mac_tactic_a",
+            question: {
+              fil: "Bakit hindi makalapit ang malalaking barko ng mga dayuhan sa Mactan?",
+              en: "Why could the strangers' big ships not come close to Mactan?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Masyadong malakas ang hangin", en: "The wind was too strong" } },
+              { id: "b", label: { fil: "Mababaw ang tubig at may bahura", en: "The water was shallow and full of coral" } },
+              { id: "c", label: { fil: "Nawala ang kanilang mapa", en: "They lost their map" } },
+              { id: "d", label: { fil: "Wala silang pagkain", en: "They had no food" } },
+            ],
+            correctChoiceId: "b",
+          },
+          {
+            id: "mac_tactic_b",
+            question: {
+              fil: "Ano ang naging kalamangan ng mga taga-Mactan sa labanan?",
+              en: "What gave the people of Mactan the advantage in the battle?",
+            },
+            choices: [
+              { id: "a", label: { fil: "Mas marami silang baril", en: "They had more guns" } },
+              { id: "b", label: { fil: "Mas malalaki ang kanilang barko", en: "They had bigger ships" } },
+              { id: "c", label: { fil: "Kabisado nila ang mababaw na tubig", en: "They knew the shallow water" } },
+              { id: "d", label: { fil: "Mas mabigat ang kanilang baluti", en: "They had heavier armour" } },
+            ],
+            correctChoiceId: "c",
+          },
+        ],
       },
-      choices: [
-        { id: "a", label: { fil: "Masyadong malakas ang hangin", en: "The wind was too strong" } },
-        { id: "b", label: { fil: "Mababaw ang tubig at may bahura", en: "The water was shallow and full of coral" } },
-        { id: "c", label: { fil: "Nawala ang kanilang mapa", en: "They lost their map" } },
-        { id: "d", label: { fil: "Wala silang pagkain", en: "They had no food" } },
-      ],
-      correctChoiceId: "b",
-    },
-  ],
+    ],
+  },
 
   nodes: [
     {
