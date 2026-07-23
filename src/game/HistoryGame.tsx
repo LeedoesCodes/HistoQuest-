@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import Phaser from "phaser";
 import { createGameConfig } from "./gameConfig";
+import { setLanguage } from "./i18n";
 import type { HistoryGameProps, ArcId, HistorySessionResult } from "@shared/types";
 
 /**
@@ -9,12 +10,15 @@ import type { HistoryGameProps, ArcId, HistorySessionResult } from "@shared/type
  * the canvas. We create the game once on mount and destroy it on unmount.
  * React never touches the game loop.
  */
-export function HistoryGame({ pupil, onComplete, startArc }: HistoryGameProps) {
+export function HistoryGame({ pupil, onComplete, startArc, language }: HistoryGameProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
 
   useEffect(() => {
     if (!hostRef.current || gameRef.current) return;
+
+    // Apply the starting language before any scene renders text.
+    if (language) setLanguage(language);
 
     const game = new Phaser.Game(createGameConfig(hostRef.current));
     gameRef.current = game;

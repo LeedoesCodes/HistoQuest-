@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import type { StoryNode } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
+import { L, t } from "../i18n";
 
 /**
  * Reusable story presenter — a narrated beat shown in a bottom text panel,
@@ -23,7 +24,7 @@ export function playStory(scene: Phaser.Scene, node: StoryNode): Promise<void> {
       .setStrokeStyle(2, COLORS.panelStroke);
 
     const text = scene.add
-      .text(40, boxY - boxH / 2 + 22, node.text, {
+      .text(40, boxY - boxH / 2 + 22, L(node.text), {
         fontFamily: FONT,
         fontSize: "20px",
         color: COLORS.text,
@@ -33,7 +34,7 @@ export function playStory(scene: Phaser.Scene, node: StoryNode): Promise<void> {
       .setOrigin(0, 0);
 
     const hint = scene.add
-      .text(width - 50, boxY + boxH / 2 - 22, "▶  Pindutin para magpatuloy", {
+      .text(width - 50, boxY + boxH / 2 - 22, t("story.continue"), {
         fontFamily: FONT,
         fontSize: "14px",
         color: COLORS.textMuted,

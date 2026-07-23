@@ -21,6 +21,20 @@ export interface Pupil {
 export type Track = "history" | "reading_proficiency" | "reading_comprehension";
 
 /**
+ * Media of instruction supported by BasaQuest (DepEd Order No. 20, s. 2025).
+ * SHARED: the reading modules are also English + Filipino, so all three tracks
+ * and the dashboard should use this one type. Cebuano/other mother tongues are
+ * future work per the manuscript's delimitation.
+ */
+export type Language = "fil" | "en";
+
+/** Narrative text authored in both languages. */
+export interface LocalizedText {
+  fil: string;
+  en: string;
+}
+
+/**
  * The one entry point the shell uses to mount the History module.
  * The shell renders <HistoryGame {...HistoryGameProps} />. As long as
  * this signature holds, the game can be built in total isolation.
@@ -31,6 +45,8 @@ export interface HistoryGameProps {
   onComplete: (result: HistorySessionResult) => void;
   /** Optional: which arc to jump straight into (else show arc select). */
   startArc?: ArcId;
+  /** Starting language. Defaults to "fil"; the pupil can switch in-game. */
+  language?: Language;
 }
 
 /** The three historical arcs. */

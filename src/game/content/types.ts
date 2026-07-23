@@ -1,4 +1,4 @@
-import type { ArcId } from "@shared/types";
+import type { ArcId, LocalizedText } from "@shared/types";
 
 /**
  * Arc content is DATA, not code. Each arc is a list of nodes the ArcScene
@@ -10,7 +10,7 @@ import type { ArcId } from "@shared/types";
 
 export interface ArcContent {
   arc: ArcId;
-  title: string;
+  title: LocalizedText;
   /**
    * Auto-scored multiple-choice questions on this arc's history. The SAME set
    * is asked before the arc (baseline) and after (retention), so post − pre is
@@ -23,14 +23,14 @@ export interface ArcContent {
 
 export interface QuizQuestion {
   id: string;
-  question: string;
+  question: LocalizedText;
   choices: QuizChoice[];
   correctChoiceId: string;
 }
 
 export interface QuizChoice {
   id: string;
-  label: string;
+  label: LocalizedText;
 }
 
 /** "pre" = baseline before the arc, "post" = retention after. */
@@ -49,7 +49,7 @@ export type ArcNode = StoryNode | DecisionNode | MiniGameNode;
 export interface StoryNode {
   id: string;
   type: "story";
-  text: string;
+  text: LocalizedText;
   /** Asset key loaded in a preloader (later). Optional while art is pending. */
   image?: string;
   /** Voiceover audio key (edge-tts MP3s, later). Optional. */
@@ -65,7 +65,7 @@ export interface StoryNode {
 export interface DecisionNode {
   id: string;
   type: "decision";
-  prompt: string;
+  prompt: LocalizedText;
   timeLimitMs: number;
   choices: DecisionChoice[];
   defaultChoiceId?: string;
@@ -73,7 +73,7 @@ export interface DecisionNode {
 
 export interface DecisionChoice {
   id: string;
-  label: string;
+  label: LocalizedText;
   /** Optional: which mini-game this choice routes into (future). */
   routeTo?: string;
 }
@@ -84,7 +84,7 @@ export interface MiniGameNode {
   type: "minigame";
   /** e.g. "cedula_tear", "katipunan_recruit", "code_unscramble". */
   key: string;
-  title: string;
+  title: LocalizedText;
 }
 
 export interface DecisionResult {

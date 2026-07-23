@@ -3,6 +3,7 @@ import type { MiniGameNode, MiniGameResult } from "../../content/types";
 import { COLORS, FONT } from "../../ui/theme";
 import { burst, shake } from "../../ui/juice";
 import { sfx } from "../../ui/sfx";
+import { t } from "../../i18n";
 
 /**
  * Cedula-tear mini-game (Pugad Lawin arc).
@@ -47,7 +48,7 @@ export function playCedulaTear(scene: Phaser.Scene, _node: MiniGameNode): Promis
       .setOrigin(0.5);
 
     const instr = scene.add
-      .text(cx, 78, "Hawakan at i-drag pahalang sa cedula\npara ito punitin!", {
+      .text(cx, 78, t("mg.cedula.instruction"), {
         fontFamily: FONT,
         fontSize: "20px",
         color: COLORS.text,
@@ -99,7 +100,7 @@ export function playCedulaTear(scene: Phaser.Scene, _node: MiniGameNode): Promis
     function fail() {
       sfx.error();
       shake(scene, 90, 0.002);
-      hint.setText("Mas mahaba at pahalang na hila!");
+      hint.setText(t("mg.cedula.retry"));
       scene.tweens.add({
         targets: paper,
         x: cx + 8,
@@ -147,7 +148,7 @@ export function playCedulaTear(scene: Phaser.Scene, _node: MiniGameNode): Promis
       scene.time.delayedCall(680, () => {
         sfx.success();
         const msg = scene.add
-          .text(cx, cy - 16, "Napunit mo ang cedula!", {
+          .text(cx, cy - 16, t("mg.cedula.done"), {
             fontFamily: FONT,
             fontSize: "26px",
             color: COLORS.text,
@@ -155,7 +156,7 @@ export function playCedulaTear(scene: Phaser.Scene, _node: MiniGameNode): Promis
           })
           .setOrigin(0.5);
         const sub = scene.add
-          .text(cx, cy + 22, "Mabuhay ang paghihimagsik!", {
+          .text(cx, cy + 22, t("mg.cedula.doneSub"), {
             fontFamily: FONT,
             fontSize: "16px",
             color: COLORS.textMuted,

@@ -3,6 +3,7 @@ import type { MiniGameNode, MiniGameResult } from "../../content/types";
 import { COLORS, FONT } from "../../ui/theme";
 import { burst, shake, flash, floatText, pop } from "../../ui/juice";
 import { sfx } from "../../ui/sfx";
+import { t } from "../../i18n";
 
 /**
  * Mactan defense mini-game (Mactan arc).
@@ -50,7 +51,7 @@ export function playMactanDefense(
     // --- HUD ---
     hud.add([
       scene.add
-        .text(width / 2, 38, "Ipagtanggol ang baybayin ng Mactan!", {
+        .text(width / 2, 38, t("mg.mactan.instruction"), {
           fontFamily: FONT,
           fontSize: "20px",
           color: COLORS.text,
@@ -58,7 +59,7 @@ export function playMactanDefense(
         })
         .setOrigin(0.5),
       scene.add
-        .text(width / 2, 64, "Pindutin ang mga sasakyang-dagat bago sila makalapag.", {
+        .text(width / 2, 64, t("mg.mactan.sub"), {
           fontFamily: FONT,
           fontSize: "13px",
           color: COLORS.textMuted,
@@ -70,7 +71,14 @@ export function playMactanDefense(
       .setOrigin(1, 0.5);
     hud.add(counter);
     const updateHud = () =>
-      counter.setText(`Naitaboy: ${repelled}   Nakalusot: ${breached}   (${spawned}/${TOTAL_INVADERS})`);
+      counter.setText(
+        t("mg.mactan.counter", {
+          repelled,
+          breached,
+          spawned,
+          total: TOTAL_INVADERS,
+        })
+      );
     updateHud();
 
     function removeInvader(c: Phaser.GameObjects.Container) {
@@ -184,7 +192,7 @@ export function playMactanDefense(
       const resultLayer = scene.add.container(0, 0).setDepth(13);
       resultLayer.add([
         scene.add
-          .text(width / 2, height / 2 - 16, `Naitaboy mo ang ${repelled} sasakyang-dagat!`, {
+          .text(width / 2, height / 2 - 16, t("mg.mactan.result", { n: repelled }), {
             fontFamily: FONT,
             fontSize: "23px",
             color: COLORS.text,
@@ -195,9 +203,7 @@ export function playMactanDefense(
           .text(
             width / 2,
             height / 2 + 22,
-            breached === 0
-              ? "Walang nakalusot — matatag ang Mactan!"
-              : "Nanindigan pa rin ang mga mandirigma ni Lapu-Lapu.",
+            t(breached === 0 ? "mg.mactan.resultWin" : "mg.mactan.resultOk"),
             { fontFamily: FONT, fontSize: "16px", color: COLORS.textMuted }
           )
           .setOrigin(0.5),

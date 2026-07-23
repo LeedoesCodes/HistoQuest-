@@ -3,6 +3,7 @@ import type { DecisionNode, DecisionResult } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
 import { pop } from "../ui/juice";
 import { sfx } from "../ui/sfx";
+import { L } from "../i18n";
 
 /**
  * Reusable timed-decision presenter. Shows a prompt, a shrinking countdown
@@ -20,7 +21,7 @@ export function playDecision(scene: Phaser.Scene, node: DecisionNode): Promise<D
 
     // Prompt
     const prompt = scene.add
-      .text(width / 2, 60, node.prompt, {
+      .text(width / 2, 60, L(node.prompt), {
         fontFamily: FONT,
         fontSize: "24px",
         color: COLORS.text,
@@ -71,7 +72,7 @@ export function playDecision(scene: Phaser.Scene, node: DecisionNode): Promise<D
         .setStrokeStyle(2, COLORS.panelStroke)
         .setInteractive({ useHandCursor: true });
       const label = scene.add
-        .text(width / 2, y, choice.label, {
+        .text(width / 2, y, L(choice.label), {
           fontFamily: FONT,
           fontSize: "20px",
           color: COLORS.text,

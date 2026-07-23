@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import type { MiniGameNode, MiniGameResult } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
+import { L, t } from "../i18n";
 
 /**
  * Placeholder for arc-specific mini-games (Mactan defense, cedula-tear,
@@ -18,7 +19,7 @@ export function playMiniGamePlaceholder(
     const layer = scene.add.container(0, 0).setDepth(10);
 
     const title = scene.add
-      .text(width / 2, height / 2 - 70, `Mini-game: ${node.title}`, {
+      .text(width / 2, height / 2 - 70, t("mg.placeholder.title", { title: L(node.title) }), {
         fontFamily: FONT,
         fontSize: "26px",
         color: COLORS.text,
@@ -27,7 +28,7 @@ export function playMiniGamePlaceholder(
       .setOrigin(0.5);
 
     const note = scene.add
-      .text(width / 2, height / 2 - 20, "(gagawin pa — placeholder)", {
+      .text(width / 2, height / 2 - 20, t("mg.placeholder.note"), {
         fontFamily: FONT,
         fontSize: "15px",
         color: COLORS.textMuted,
@@ -38,7 +39,7 @@ export function playMiniGamePlaceholder(
       .rectangle(width / 2, height / 2 + 60, 300, 60, COLORS.success)
       .setInteractive({ useHandCursor: true });
     const btnText = scene.add
-      .text(width / 2, height / 2 + 60, "Tapusin ang mini-game", {
+      .text(width / 2, height / 2 + 60, t("mg.placeholder.finish"), {
         fontFamily: FONT,
         fontSize: "18px",
         color: "#0a0f1c",

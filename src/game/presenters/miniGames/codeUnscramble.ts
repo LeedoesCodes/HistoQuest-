@@ -3,6 +3,7 @@ import type { MiniGameNode, MiniGameResult } from "../../content/types";
 import { COLORS, FONT } from "../../ui/theme";
 import { burst, shake } from "../../ui/juice";
 import { sfx } from "../../ui/sfx";
+import { getLanguage, t } from "../../i18n";
 
 /**
  * Code-unscramble mini-game (Pugad Lawin arc).
@@ -16,7 +17,11 @@ import { sfx } from "../../ui/sfx";
  */
 
 // The message to decode (word order = the answer). Kept short for Grade 5.
-const TARGET_WORDS = ["Mabuhay", "ang", "mga", "Katipunero"];
+// Authored per language: the puzzle IS the sentence, so it must be translated.
+const TARGET_BY_LANG = {
+  fil: ["Mabuhay", "ang", "mga", "Katipunero"],
+  en: ["Long", "live", "the", "Katipuneros"],
+} as const;
 
 interface Tile {
   id: number;
@@ -43,6 +48,7 @@ export function playCodeUnscramble(
     let done = false;
     let locked = false; // blocks input during check/feedback animations
 
+    const TARGET_WORDS: readonly string[] = TARGET_BY_LANG[getLanguage()];
     const targetStr = TARGET_WORDS.join(" ");
     const allTiles: Tile[] = TARGET_WORDS.map((word, id) => ({ id, word }));
     const poolOrder = shuffle(allTiles).map((t) => t.id);
@@ -61,7 +67,7 @@ export function playCodeUnscramble(
       .setOrigin(0.5);
     staticLayer.add([
       scene.add
-        .text(width / 2, 70, "Ayusin ang lihim na mensahe ng mga Katipunero!", {
+        .text(width / 2, 70, t("mg.code.instruction"), {
           fontFamily: FONT,
           fontSize: "20px",
           color: COLORS.text,
@@ -71,7 +77,7 @@ export function playCodeUnscramble(
         })
         .setOrigin(0.5),
       scene.add
-        .text(width / 2, 100, "Pindutin ang mga salita sa tamang pagkakasunod.", {
+        .text(width / 2, 100, t("mg.code.sub"), {
           fontFamily: FONT,
           fontSize: "14px",
           color: COLORS.textMuted,
@@ -162,7 +168,7 @@ export function playCodeUnscramble(
         locked = true;
         sfx.error();
         shake(scene, 160, 0.005);
-        feedback.setColor("#e4572e").setText("Mali ang code! Subukan mong muli.");
+        feedback.setColor("#e4572e").setText(t("mg.code.wrong"));
         scene.time.delayedCall(900, () => {
           // return everything to the pool and let them retry
           while (answer.length) pool.push(answer.pop()!);
@@ -185,7 +191,7 @@ export function playCodeUnscramble(
       const winLayer = scene.add.container(0, 0).setDepth(12);
       winLayer.add([
         scene.add
-          .text(width / 2, height / 2 - 20, "Na-decode mo ang mensahe!", {
+          .text(width / 2, height / 2 - 20, t("mg.code.done"), {
             fontFamily: FONT,
             fontSize: "24px",
             color: COLORS.text,

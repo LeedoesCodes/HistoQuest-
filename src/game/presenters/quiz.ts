@@ -3,16 +3,7 @@ import type { AssessmentPhase, QuizQuestion, QuizResult } from "../content/types
 import { COLORS, FONT } from "../ui/theme";
 import { pop } from "../ui/juice";
 import { sfx } from "../ui/sfx";
-
-const PHASE_TITLE: Record<AssessmentPhase, string> = {
-  pre: "Panimulang Pagsusulit",
-  post: "Pagsusulit sa Natutuhan",
-};
-
-const PHASE_SUB: Record<AssessmentPhase, string> = {
-  pre: "Subukan mo muna — ayos lang kung hindi mo pa alam!",
-  post: "Ano ang natutuhan mo sa kabanata?",
-};
+import { L, t } from "../i18n";
 
 /**
  * Reusable auto-scored multiple-choice quiz. Asks each question once, records
@@ -38,7 +29,7 @@ export function playQuiz(
     const headerLayer = scene.add.container(0, 0).setDepth(15);
     headerLayer.add([
       scene.add
-        .text(width / 2, 46, PHASE_TITLE[phase], {
+        .text(width / 2, 46, t(phase === "pre" ? "quiz.pre.title" : "quiz.post.title"), {
           fontFamily: FONT,
           fontSize: "24px",
           color: COLORS.accentText,
@@ -46,7 +37,7 @@ export function playQuiz(
         })
         .setOrigin(0.5),
       scene.add
-        .text(width / 2, 78, PHASE_SUB[phase], {
+        .text(width / 2, 78, t(phase === "pre" ? "quiz.pre.sub" : "quiz.post.sub"), {
           fontFamily: FONT,
           fontSize: "14px",
           color: COLORS.textMuted,
@@ -61,7 +52,7 @@ export function playQuiz(
       const q = questions[index];
 
       const progress = scene.add
-        .text(width / 2, 118, `Tanong ${index + 1}/${questions.length}`, {
+        .text(width / 2, 118, t("quiz.progress", { n: index + 1, total: questions.length }), {
           fontFamily: FONT,
           fontSize: "14px",
           color: COLORS.textMuted,
@@ -69,7 +60,7 @@ export function playQuiz(
         .setOrigin(0.5);
 
       const question = scene.add
-        .text(width / 2, 170, q.question, {
+        .text(width / 2, 170, L(q.question), {
           fontFamily: FONT,
           fontSize: "22px",
           color: COLORS.text,
@@ -90,7 +81,7 @@ export function playQuiz(
           .setStrokeStyle(2, COLORS.panelStroke)
           .setInteractive({ useHandCursor: true });
         const label = scene.add
-          .text(width / 2, y, choice.label, {
+          .text(width / 2, y, L(choice.label), {
             fontFamily: FONT,
             fontSize: "19px",
             color: COLORS.text,

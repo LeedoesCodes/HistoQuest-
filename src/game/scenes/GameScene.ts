@@ -12,6 +12,7 @@ import { getMiniGame } from "../presenters/miniGames";
 import { COLORS, FONT } from "../ui/theme";
 import { burst, pop } from "../ui/juice";
 import { sfx } from "../ui/sfx";
+import { L, t } from "../i18n";
 
 /**
  * GameScene — the ONLY scene. Everything (arc select, story, decisions,
@@ -51,7 +52,7 @@ export class GameScene extends Phaser.Scene {
 
     const chrome = this.add.container(0, 0).setDepth(5);
     chrome.add(
-      this.add.text(20, 16, content.title, {
+      this.add.text(20, 16, L(content.title), {
         fontFamily: FONT,
         fontSize: "16px",
         color: COLORS.textMuted,
@@ -138,11 +139,11 @@ export class GameScene extends Phaser.Scene {
   ): Promise<void> {
     return new Promise((resolve) => {
       const { width, height } = this.scale;
-      const labelText = label === "deep" ? "Deep Learner" : "Surface Learner";
+      const labelText = t(label === "deep" ? "summary.deep" : "summary.surface");
       const pct = (s: number) => `${Math.round(s * 100)}%`;
       const gain = postScore - preScore;
       const gainText =
-        gain > 0 ? `+${pct(gain)} ↑` : gain < 0 ? `${pct(gain)} ↓` : "walang pagbabago";
+        gain > 0 ? `+${pct(gain)} ↑` : gain < 0 ? `${pct(gain)} ↓` : t("summary.noChange");
 
       const layer = this.add.container(0, 0).setDepth(20);
       const btn = this.add
@@ -152,7 +153,7 @@ export class GameScene extends Phaser.Scene {
 
       layer.add([
         this.add
-          .text(width / 2, height / 2 - 80, "Tapos na ang kabanata!", {
+          .text(width / 2, height / 2 - 80, t("summary.title"), {
             fontFamily: FONT,
             fontSize: "28px",
             color: COLORS.text,
@@ -163,7 +164,7 @@ export class GameScene extends Phaser.Scene {
           .text(
             width / 2,
             height / 2 - 30,
-            `Natutuhan: ${pct(preScore)} → ${pct(postScore)}   (${gainText})`,
+            t("summary.learned", { pre: pct(preScore), post: pct(postScore), gain: gainText }),
             { fontFamily: FONT, fontSize: "18px", color: COLORS.accentText }
           )
           .setOrigin(0.5),
@@ -171,13 +172,13 @@ export class GameScene extends Phaser.Scene {
           .text(
             width / 2,
             height / 2 + 2,
-            `Engagement: ${labelText}  (${Math.round(confidence * 100)}%)`,
+            t("summary.engagement", { label: labelText, pct: Math.round(confidence * 100) }),
             { fontFamily: FONT, fontSize: "18px", color: COLORS.textMuted }
           )
           .setOrigin(0.5),
         btn,
         this.add
-          .text(width / 2, height / 2 + 80, "Bumalik sa menu", {
+          .text(width / 2, height / 2 + 80, t("summary.back"), {
             fontFamily: FONT,
             fontSize: "16px",
             color: COLORS.text,

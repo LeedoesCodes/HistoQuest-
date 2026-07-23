@@ -3,6 +3,7 @@ import type { MiniGameNode, MiniGameResult } from "../../content/types";
 import { COLORS, FONT } from "../../ui/theme";
 import { burst, shake, floatText, pop } from "../../ui/juice";
 import { sfx } from "../../ui/sfx";
+import { t } from "../../i18n";
 
 /**
  * Katipunan recruitment mini-game (Pugad Lawin arc).
@@ -37,7 +38,7 @@ export function playKatipunanRecruit(
 
     hud.add([
       scene.add
-        .text(width / 2, 40, "Pindutin ang mga Pilipino para sumapi sa Katipunan!", {
+        .text(width / 2, 40, t("mg.recruit.instruction"), {
           fontFamily: FONT,
           fontSize: "19px",
           color: COLORS.text,
@@ -47,7 +48,7 @@ export function playKatipunanRecruit(
         })
         .setOrigin(0.5),
       scene.add
-        .text(width / 2, 68, "Iwasan ang mga guwardiyang Espanyol (pula).", {
+        .text(width / 2, 68, t("mg.recruit.sub"), {
           fontFamily: FONT,
           fontSize: "13px",
           color: COLORS.textMuted,
@@ -56,7 +57,7 @@ export function playKatipunanRecruit(
     ]);
 
     const counter = scene.add
-      .text(24, 100, `Nakuha: ${recruited}/${TARGET}`, {
+      .text(24, 100, t("mg.recruit.counter", { n: recruited, target: TARGET }), {
         fontFamily: FONT,
         fontSize: "18px",
         color: COLORS.accentText,
@@ -97,7 +98,7 @@ export function playKatipunanRecruit(
       const head = scene.add.circle(0, -18, 13, 0xe8c9a0);
       const body = scene.add.rectangle(0, 14, 34, 34, isFilipino ? 0x8d6e63 : 0x37474f);
       const label = scene.add
-        .text(0, 40, isFilipino ? "Pilipino" : "Guwardiya", {
+        .text(0, 40, t(isFilipino ? "mg.recruit.filipino" : "mg.recruit.guard"), {
           fontFamily: FONT,
           fontSize: "11px",
           color: isFilipino ? "#9ccc9c" : "#e79b8f",
@@ -114,7 +115,7 @@ export function playKatipunanRecruit(
         if (done) return;
         if (isFilipino) {
           recruited++;
-          counter.setText(`Nakuha: ${recruited}/${TARGET}`);
+          counter.setText(t("mg.recruit.counter", { n: recruited, target: TARGET }));
           sfx.hit();
           burst(scene, x, y, [0x8bc34a, 0xffd54a], 12, 150);
           floatText(scene, x, y - 30, "+1", "#ffd54a");
@@ -173,7 +174,7 @@ export function playKatipunanRecruit(
       const resultLayer = scene.add.container(0, 0).setDepth(13);
       resultLayer.add([
         scene.add
-          .text(width / 2, height / 2 - 16, `Nakuha mo: ${recruited} Katipunero!`, {
+          .text(width / 2, height / 2 - 16, t("mg.recruit.result", { n: recruited }), {
             fontFamily: FONT,
             fontSize: "24px",
             color: COLORS.text,
@@ -184,7 +185,7 @@ export function playKatipunanRecruit(
           .text(
             width / 2,
             height / 2 + 22,
-            recruited >= TARGET ? "Lumakas ang hukbo ng himagsikan!" : "Magaling! Patuloy ang laban.",
+            t(recruited >= TARGET ? "mg.recruit.resultWin" : "mg.recruit.resultOk"),
             { fontFamily: FONT, fontSize: "16px", color: COLORS.textMuted }
           )
           .setOrigin(0.5),
