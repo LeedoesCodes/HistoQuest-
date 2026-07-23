@@ -4,6 +4,7 @@ import { playMiniGamePlaceholder } from "../miniGamePlaceholder";
 import { playCedulaTear } from "./cedulaTear";
 import { playCodeUnscramble } from "./codeUnscramble";
 import { playKatipunanRecruit } from "./katipunanRecruit";
+import { playMactanDefense } from "./mactanDefense";
 
 export type MiniGamePresenter = (
   scene: Phaser.Scene,
@@ -22,6 +23,7 @@ const REGISTRY: Record<string, MiniGamePresenter> = {
   cedula_tear: playCedulaTear,
   code_unscramble: playCodeUnscramble,
   katipunan_recruit: playKatipunanRecruit,
+  mactan_defense: playMactanDefense,
 };
 
 export function getMiniGame(key: string): MiniGamePresenter {

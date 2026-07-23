@@ -41,7 +41,40 @@ const mactanArc: ArcContent = {
         "Abril 1521. Nasa baybayin ka ng Mactan kasama si Lapu-Lapu at ang " +
         "kaniyang mga mandirigma. May mga barko ng dayuhan sa malayo.",
     },
+    {
+      id: "mac_intro_2",
+      type: "story",
+      text:
+        "“Mababaw ang tubig dito,” wika ni Lapu-Lapu. “Hindi makakalapit ang " +
+        "malalaking barko nila. Dito tayo lalaban.” Tumingin siya sa iyo — " +
+        "kailangan niya ng katulong.",
+    },
+    {
+      id: "mac_decision",
+      type: "decision",
+      prompt: "Paano mo tutulungan si Lapu-Lapu?",
+      timeLimitMs: 8000,
+      defaultChoiceId: "shore",
+      choices: [
+        { id: "shore", label: "Bantayan ang baybayin", routeTo: "mactan_defense" },
+        { id: "warn", label: "Balaan ang mga kasamahan", routeTo: "mactan_defense" },
+      ],
+    },
     { id: "mac_minigame", type: "minigame", key: "mactan_defense", title: "Depensa sa Mactan" },
+    {
+      id: "mac_outro_1",
+      type: "story",
+      text:
+        "Hindi nakalapag ang mga dayuhan. Sa mababaw na tubig ng Mactan, " +
+        "natalo ang hukbo ni Magellan — at siya mismo ay nasawi sa labanan.",
+    },
+    {
+      id: "mac_outro_2",
+      type: "story",
+      text:
+        "Si Lapu-Lapu ang naging unang pinunong Pilipino na matagumpay na " +
+        "lumaban sa mga dayuhang mananakop. Nasaksihan mo ang kasaysayan.",
+    },
   ],
 };
 

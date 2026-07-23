@@ -36,14 +36,31 @@ merges with the reading modules + teacher dashboard via shared contracts.
 - `pugad_lawin` — Sigaw sa Pugad Lawin (Bonifacio, 1896): 3 mechanics
 - `datu_bago` — Paglaban ni Datu Bago (Davao del Norte): community defense
 
-## Scene structure
+## Scene structure — ONE scene
 
 - `src/game/gameConfig.ts` — Phaser config + scene list
-- `src/game/scenes/TitleScene.ts` — arc select (current entry scene)
-- `src/game/scenes/BootScene.ts` — **not wired yet.** Reserve for a real
-  Preloader once assets exist. NOTE: in Phaser 3.90, starting the next scene
-  from inside `create()` stalled the target at INIT; when a Preloader is added,
-  verify the handoff on a clean load (make the preloader the FIRST scene).
+- `src/game/scenes/GameScene.ts` — **the only scene.** Its `mainLoop()` is
+  `arc select → run arc → summary → repeat`, awaiting one presenter at a time.
+- `src/game/presenters/*` — every screen (arcSelect, story, decision, quiz) and
+  `presenters/miniGames/*` (registry keyed by the content's `key`).
+
+**Presenter rule (important):** a presenter must draw into a container it
+creates on entry and destroys on exit, and resolve a Promise when done. Drawing
+straight onto the scene leaks UI onto the next screen — this has bitten twice
+(quiz header, code-unscramble instructions).
+
+## Testing gotcha (cost hours once)
+
+Phaser drives everything from `requestAnimationFrame`. If the preview tab is
+hidden (`document.visibilityState === "hidden"`), rAF never fires, so the scene
+clock, timers, and tweens are all frozen — while synthetic `obj.emit(...)` still
+works because it bypasses the loop. Symptoms look like game bugs (scenes stuck
+at INIT, spawners not spawning). To test in a hidden tab, pump frames manually:
+
+```js
+let t = performance.now();
+for (let i = 0; i < 15; i++) { t += 16.7; game.step(t, 16.7); }
+```
 
 ## Behavioral logging → classifier
 

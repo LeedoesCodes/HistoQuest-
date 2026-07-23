@@ -1,9 +1,5 @@
 import Phaser from "phaser";
-import { TitleScene } from "./scenes/TitleScene";
-import { ArcScene } from "./scenes/ArcScene";
-// BootScene is kept for when real assets exist (a dedicated Preloader).
-// For now there is nothing to preload, so TitleScene is the entry scene.
-// import { BootScene } from "./scenes/BootScene";
+import { GameScene } from "./scenes/GameScene";
 
 /** Design resolution. Phaser's Scale.FIT letterboxes to any screen. */
 export const GAME_WIDTH = 800;
@@ -20,6 +16,8 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: [TitleScene, ArcScene],
+    // ONE scene for the whole game; presenters draw everything into it.
+    // See GameScene for the rationale.
+    scene: [GameScene],
   };
 }
