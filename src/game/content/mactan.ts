@@ -164,7 +164,7 @@ export const mactanArc: ArcContent = {
       name: { fil: "Ikaw", en: "You" },
       role: { fil: "Batang mandaragat ng Mactan", en: "A young seafarer of Mactan" },
       historicity: "fictional",
-      image: "common/char_ally",
+      image: "mactan/char_ally",
       lines: [
         {
           fil: "Araw-araw kang nangingisda sa mababaw na tubig.",

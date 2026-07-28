@@ -29,6 +29,7 @@ export const MESSAGES = {
   "dyk.title": { fil: "Alam Mo Ba?", en: "Did You Know?" },
   "dyk.real": { fil: "Totoo:", en: "True:" },
   "dyk.invented": { fil: "Kuwento lang:", en: "Story only:" },
+  "dyk.studying": { fil: "Pinag-aaralan pa:", en: "Still being studied:" },
 
   // --- Quiz ---
   "quiz.pre.title": { fil: "Panimulang Pagsusulit", en: "Pre-Test" },

@@ -71,6 +71,24 @@ export function playDidYouKnow(scene: Phaser.Scene, node: DidYouKnowNode): Promi
     section(t("dyk.real"), node.real.map(L), 0x8bc34a, "#9ccc9c", "✓");
     section(t("dyk.invented"), node.invented.map(L), 0xffd54a, "#ffd54a", "✎");
 
+    // Optional "historians still debate this" line.
+    if (node.note) {
+      const head = scene.add
+        .text(46, y, t("dyk.studying"), { fontFamily: FONT, fontSize: "16px", color: "#7fb3d5", fontStyle: "bold" })
+        .setOrigin(0, 0);
+      const txt = scene.add
+        .text(76, y + 26, `🔎  ${L(node.note)}`, {
+          fontFamily: FONT,
+          fontSize: "14px",
+          color: COLORS.textMuted,
+          wordWrap: { width: width - 130 },
+          lineSpacing: 3,
+        })
+        .setOrigin(0, 0);
+      const rule = scene.add.rectangle(38, head.y + 6, 3, txt.height + 26, 0x4a7ba6).setOrigin(0, 0);
+      layer.add([head, txt, rule]);
+    }
+
     const hint = scene.add
       .text(width - 40, height - 26, t("story.continue"), {
         fontFamily: FONT,

@@ -136,11 +136,21 @@ game with no code change.
 Legend: **BG** = opaque full-screen · **CHAR** = transparent bust portrait ·
 **SPRITE** = transparent object/figure.
 
-### 5a. Shared (`assets/common/`)
+### 5a. The ally (per arc — SAME design, era-appropriate clothing)
+
+The pupil plays a fictional child ally. It must be **the same character design**
+(same face, hair, spirit, art style) in all three arcs, but wearing
+**era-appropriate clothing** — a 1521 seafarer looks different from an 1896
+messenger. So: draw the ally once, then make three costume variants.
 
 | File | Type | Size | Notes |
 |---|---|---|---|
-| `char_ally.png` | CHAR | 400×500 | **The pupil's character. Used in all 3 arcs — the anchor of consistency.** An unnamed young Filipino seafarer child, ~11, brown skin, simple pre-colonial-to-rural clothing that reads as "ordinary kid," warm and brave, not a warrior. See bible §6. |
+| `mactan/char_ally.png` | CHAR | 400×500 | ~11, brown skin. **1521** pre-colonial seafarer child — simple bahag/wrap, barefoot. |
+| `pugad_lawin/char_ally.png` | CHAR | 400×500 | Same child. **1896** Katipunan messenger — simple 1890s rural clothes (camisa, maybe a small red kerchief). |
+| `datu_bago/char_ally.png` | CHAR | 400×500 | Same child. **Davao / Spanish-colonial** — era- and region-appropriate; coordinate with the Bagobo references (§8). |
+
+**Consistency tip:** generate the Mactan ally first as the "master," then use it
+as the character reference for the other two and change only the clothing prompt.
 
 ### 5b. Mactan — 1521 (`assets/mactan/`)
 
@@ -159,6 +169,7 @@ Legend: **BG** = opaque full-screen · **CHAR** = transparent bust portrait ·
 |---|---|---|---|
 | `bg.png` | BG | 1600×1200 | A grassy clearing/hillside, many Katipuneros gathered, overcast hopeful morning, August 1896. |
 | `char_bonifacio.png` | CHAR | 400×500 | Andres Bonifacio, 1896 — see §8. Holding/raising a cedula fits the story. |
+| `char_jacinto.png` | CHAR | 400×500 | Emilio Jacinto, ~20, the young "Brain of the Katipunan." Youthful, intelligent, 1890s clothing. |
 | `cedula.png` | SPRITE | 720×440 | A 19th-c. Spanish community-tax certificate (aged paper, official-looking header, a red seal). The game tears it, so make it a clean single document. |
 | `recruit_villager.png` | SPRITE | 160×200 | A 1890s rural Filipino (barong/camisa, salakot ok), friendly — someone to recruit. Full body, front. |
 | `recruit_guard.png` | SPRITE | 160×200 | A Spanish *guardia civil*, 1890s uniform + rifle. Full body, front. **Reads as "avoid me"** but not gory. |
@@ -188,8 +199,9 @@ Write the exact same descriptor every time a character recurs. Example format �
 **fill in and freeze once you generate the first version:**
 
 - **Ally (the pupil):** young Filipino child ~11, warm brown skin, short black
-  hair, [exact clothing + 1 signature detail, e.g. a woven band], barefoot,
-  curious brave expression. *Same in Mactan, Pugad Lawin, Datu Bago.*
+  hair, [1 signature detail that stays constant, e.g. a small scar or hair tie],
+  curious brave expression. **Same face/design in all three arcs; only the
+  era-appropriate clothing changes** (see §5a).
 - **Amihan:** younger sibling ~7, same skin/hair family, [smaller version of the
   ally's world].
 - **Lapu-Lapu / Magellan / Humabon / Bonifacio / Datu Bago:** lock each one's

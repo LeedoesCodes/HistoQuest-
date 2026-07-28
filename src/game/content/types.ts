@@ -103,6 +103,12 @@ export interface DidYouKnowNode {
   type: "didyouknow";
   real: LocalizedText[];
   invented: LocalizedText[];
+  /**
+   * Optional "historians still debate this" line. Teaches that history is
+   * studied, not just memorised — and lets an arc name a real controversy
+   * (e.g. Pugad Lawin vs. Balintawak) honestly.
+   */
+  note?: LocalizedText;
 }
 
 /** A narrated story beat: text, optional illustration, optional voiceover. */
