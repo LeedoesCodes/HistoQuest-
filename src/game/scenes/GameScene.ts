@@ -17,6 +17,8 @@ import { COLORS, FONT } from "../ui/theme";
 import { burst, pop } from "../ui/juice";
 import { sfx } from "../ui/sfx";
 import { L, t } from "../i18n";
+import { IMAGE_URLS } from "../assets/images";
+import { createBackdrop } from "../ui/backdrop";
 
 /**
  * GameScene — the ONLY scene. Everything (arc select, story, decisions,
@@ -32,6 +34,17 @@ import { L, t } from "../i18n";
 export class GameScene extends Phaser.Scene {
   constructor() {
     super("Game");
+  }
+
+  /**
+   * Load whatever art has shipped. The registry is generated from the files
+   * actually present, so this is a no-op on a fresh clone with no assets and
+   * the game still runs — art is additive, never required.
+   */
+  preload() {
+    for (const [key, url] of Object.entries(IMAGE_URLS)) {
+      if (!this.textures.exists(key)) this.load.image(key, url);
+    }
   }
 
   create() {
@@ -53,6 +66,9 @@ export class GameScene extends Phaser.Scene {
     const content = getArcContent(arcId);
     const logger = new BehaviorLogger(pupil.id, arcId);
     const startedAt = new Date().toISOString();
+
+    // Scene backdrop for the whole arc (real art if shipped, generated if not).
+    const backdrop = createBackdrop(this, arcId);
 
     const chrome = this.add.container(0, 0).setDepth(5);
     chrome.add(
@@ -117,6 +133,7 @@ export class GameScene extends Phaser.Scene {
 
     await this.showSummary(pre.score, post.score, engagement.label, engagement.confidence);
     chrome.destroy(true);
+    backdrop.destroy(true);
   }
 
   private async playNodes(content: ArcContent, logger: BehaviorLogger) {

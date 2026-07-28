@@ -164,6 +164,7 @@ export const mactanArc: ArcContent = {
       name: { fil: "Ikaw", en: "You" },
       role: { fil: "Batang mandaragat ng Mactan", en: "A young seafarer of Mactan" },
       historicity: "fictional",
+      image: "common/char_ally",
       lines: [
         {
           fil: "Araw-araw kang nangingisda sa mababaw na tubig.",
@@ -187,6 +188,7 @@ export const mactanArc: ArcContent = {
       name: { fil: "Lapu-Lapu", en: "Lapu-Lapu" },
       role: { fil: "Datu ng Mactan", en: "Datu of Mactan" },
       historicity: "real",
+      image: "mactan/char_lapulapu",
       lines: [
         {
           fil: "Hindi siya sumisigaw. Nakatingin lang siya sa dagat, matagal.",
@@ -240,6 +242,7 @@ export const mactanArc: ArcContent = {
       name: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" },
       role: { fil: "Kapitan ng mga dayuhang barko", en: "Captain of the foreign ships" },
       historicity: "real",
+      image: "mactan/char_magellan",
       lines: [
         {
           fil: "Matapang siya at hindi sumusuko. Naglakbay siya nang mas malayo kaysa halos sinuman noon.",

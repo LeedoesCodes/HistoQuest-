@@ -122,7 +122,16 @@ image, lock the seed and change only the prompt — don't reroll randomly.
 ## 5. The asset list
 
 File names and folders below are what the code will load — **use them exactly**.
-Everything goes under `public/assets/` in the repo (create the folders).
+Everything goes under **`src/game/assets/img/`** in the repo (the folders already
+exist). Files are picked up automatically: drop a PNG in and it appears in the
+game with no code change.
+
+> Naming maps directly to the in-game key:
+> `src/game/assets/img/mactan/char_lapulapu.png` -> key `mactan/char_lapulapu`
+>
+> Each arc's full-screen background must be named exactly **`bg.png`**
+> (e.g. `mactan/bg.png`). Until it exists the game draws a generated scene in
+> that arc's colours, so nothing looks broken while art is in progress.
 
 Legend: **BG** = opaque full-screen · **CHAR** = transparent bust portrait ·
 **SPRITE** = transparent object/figure.
@@ -137,7 +146,7 @@ Legend: **BG** = opaque full-screen · **CHAR** = transparent bust portrait ·
 
 | File | Type | Size | Notes |
 |---|---|---|---|
-| `bg_shore_dawn.png` | BG | 1600×1200 | Mactan shoreline at dawn, calm shallow sea, coral reef hinted, distant tall foreign sails on the horizon. Quiet, tense. |
+| `bg.png` | BG | 1600×1200 | Mactan shoreline at dawn, calm shallow sea, coral reef hinted, distant tall foreign sails on the horizon. Quiet, tense. |
 | `char_lapulapu.png` | CHAR | 400×500 | Datu of Mactan. Dignified Visayan warrior — see §8 accuracy. Calm, watchful, older. |
 | `char_magellan.png` | CHAR | 400×500 | 16th-c. Iberian captain — morion helmet / breastplate era. Determined, weathered. **Not evil-looking, not a villain caricature.** |
 | `char_humabon.png` | CHAR | 400×500 | Rajah of Cebu. Pre-colonial Visayan noble/datu attire, a bit more adorned than a common person. |
@@ -148,7 +157,7 @@ Legend: **BG** = opaque full-screen · **CHAR** = transparent bust portrait ·
 
 | File | Type | Size | Notes |
 |---|---|---|---|
-| `bg_gathering.png` | BG | 1600×1200 | A grassy clearing/hillside, many Katipuneros gathered, overcast hopeful morning, August 1896. |
+| `bg.png` | BG | 1600×1200 | A grassy clearing/hillside, many Katipuneros gathered, overcast hopeful morning, August 1896. |
 | `char_bonifacio.png` | CHAR | 400×500 | Andres Bonifacio, 1896 — see §8. Holding/raising a cedula fits the story. |
 | `cedula.png` | SPRITE | 720×440 | A 19th-c. Spanish community-tax certificate (aged paper, official-looking header, a red seal). The game tears it, so make it a clean single document. |
 | `recruit_villager.png` | SPRITE | 160×200 | A 1890s rural Filipino (barong/camisa, salakot ok), friendly — someone to recruit. Full body, front. |
@@ -158,7 +167,7 @@ Legend: **BG** = opaque full-screen · **CHAR** = transparent bust portrait ·
 
 | File | Type | Size | Notes |
 |---|---|---|---|
-| `bg_davao_river.png` | BG | 1600×1200 | The Davao River / gulf area, lush, warm. |
+| `bg.png` | BG | 1600×1200 | The Davao River / gulf area, lush, warm. |
 | `char_datubago.png` | CHAR | 400×500 | Datu Bago, Bagobo/Davao leader. **Requires real Bagobo reference — see §8.** |
 | `char_bagobo.png` | CHAR | 400×500 | A Bagobo community member. Same accuracy bar. |
 
@@ -257,10 +266,10 @@ Also hand over, so more can be made consistently later:
 - [ ] The **style-key reference image** and the exact **tool + base prompt + seed**
       used, and the frozen **character-bible** lines (section 6).
 
-Drop finished files in `public/assets/<arc>/…` (or a shared Drive folder and Lee
-will place them). Once they land, wiring them into the scenes is a small,
-mechanical code change — the story/character/mini-game code already has optional
-`image` slots waiting for these keys.
+Drop finished files in `src/game/assets/img/<arc>/…` (or a shared Drive folder
+and Lee will place them). **No code change is needed** — the loader discovers
+files automatically and the story/character nodes already reference these keys,
+so art appears the moment the file lands.
 
 ---
 

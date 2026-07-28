@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import type { CharacterNode } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
 import { L, t } from "../i18n";
+import { hasImage } from "../assets/images";
 
 /**
  * Character introduction card — the cinematic "who is this person" beat.
@@ -11,8 +12,9 @@ import { L, t } from "../i18n";
  * really existed. That is a continuous honesty signal and it quietly teaches
  * children to ask how we know things — better than one skippable disclaimer.
  *
- * `node.image` is unused until art exists; the portrait is a placeholder plate
- * with a slow zoom so the card still feels cinematic.
+ * `node.image` is drawn when that portrait has shipped; until then the card
+ * falls back to a placeholder plate. Either way it gets a slow Ken Burns drift
+ * so the beat feels cinematic rather than static.
  */
 export function playCharacter(scene: Phaser.Scene, node: CharacterNode): Promise<void> {
   return new Promise((resolve) => {
@@ -20,18 +22,39 @@ export function playCharacter(scene: Phaser.Scene, node: CharacterNode): Promise
     const layer = scene.add.container(0, 0).setDepth(18);
     const isReal = node.historicity === "real";
 
-    // --- Portrait placeholder (slow Ken Burns zoom) ---
+    // --- Portrait: real art if it has shipped, placeholder plate if not ---
     const portraitX = 150;
     const portraitY = height / 2 - 30;
-    const plate = scene.add
-      .rectangle(portraitX, portraitY, 180, 220, COLORS.panel)
-      .setStrokeStyle(3, isReal ? COLORS.accent : 0x8e7cc3);
-    const head = scene.add.circle(portraitX, portraitY - 34, 40, 0xe8c9a0);
-    const body = scene.add.rectangle(portraitX, portraitY + 62, 104, 84, isReal ? 0x8d6e63 : 0x5c6bc0);
-    const portrait = scene.add.container(0, 0, [plate, head, body]);
+    const frameW = 180;
+    const frameH = 220;
+    const accent = isReal ? COLORS.accent : 0x8e7cc3;
+
+    const portrait = scene.add.container(0, 0);
+    const zoomTargets: Phaser.GameObjects.GameObject[] = [];
+
+    if (hasImage(node.image) && scene.textures.exists(node.image)) {
+      const img = scene.add.image(portraitX, portraitY, node.image);
+      // Fit inside the frame without distorting the artwork.
+      img.setScale(Math.min(frameW / img.width, frameH / img.height));
+      const frame = scene.add
+        .rectangle(portraitX, portraitY, frameW, frameH)
+        .setStrokeStyle(3, accent);
+      portrait.add([img, frame]);
+      zoomTargets.push(img);
+    } else {
+      const plate = scene.add
+        .rectangle(portraitX, portraitY, frameW, frameH, COLORS.panel)
+        .setStrokeStyle(3, accent);
+      const head = scene.add.circle(portraitX, portraitY - 34, 40, 0xe8c9a0);
+      const body = scene.add.rectangle(portraitX, portraitY + 62, 104, 84, isReal ? 0x8d6e63 : 0x5c6bc0);
+      portrait.add([plate, head, body]);
+      zoomTargets.push(plate, head, body);
+    }
+
+    // Slow Ken Burns drift so the card feels cinematic even without art.
     scene.tweens.add({
-      targets: [plate, head, body],
-      scale: 1.06,
+      targets: zoomTargets,
+      scale: (t: Phaser.GameObjects.Image) => (t.scale || 1) * 1.06,
       duration: 5000,
       ease: "Sine.easeInOut",
       yoyo: true,
