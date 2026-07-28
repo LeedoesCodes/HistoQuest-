@@ -62,6 +62,18 @@ let t = performance.now();
 for (let i = 0; i < 15; i++) { t += 16.7; game.step(t, 16.7); }
 ```
 
+## Art assets (additive — never required)
+
+Images live in `src/game/assets/img/<arc|common>/*.png` and are auto-discovered
+at build time (`assets/images.ts`, Vite glob). Path → key:
+`img/mactan/char_lapulapu.png` → `"mactan/char_lapulapu"`. `GameScene.preload()`
+loads whatever exists.
+
+**Rule: every draw site must degrade gracefully** (`hasImage(key)`), because art
+lands gradually and the game must stay demo-able with zero assets. Each arc's
+background is `<arc>/bg.png`; without it `ui/backdrop.ts` paints a generated
+scene in that arc's palette. Author-facing spec: `docs/asset-brief.md`.
+
 ## Behavioral logging → classifier
 
 Scenes emit `BehaviorEvent`s (see `types.ts`): decision choices + `msElapsed`,
