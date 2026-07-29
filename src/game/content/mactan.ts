@@ -466,13 +466,13 @@ export const mactanArc: ArcContent = {
         fil:
           "Si Lapu-Lapu ang naging unang pinunong Pilipino\n" +
           "na matagumpay na lumaban sa mga dayuhang mananakop.\n" +
-          "Hindi dahil mas marami sila —\n" +
-          "kundi dahil kilala nila ang sarili nilang dagat.",
+          "Kakaunti lang ang mga nakababang kalaban —\n" +
+          "higit silang marami, at kilala nila ang sariling dagat.",
         en:
           "Lapu-Lapu became the first Filipino leader\n" +
           "to successfully resist foreign invaders.\n" +
-          "Not because they had more men —\n" +
-          "but because they knew their own sea.",
+          "Only a few invaders made it ashore —\n" +
+          "they were far more in number, and knew their own sea.",
       },
     },
     {
@@ -500,6 +500,10 @@ export const mactanArc: ArcContent = {
         {
           fil: "Hindi nakalapit ang malalaking barko dahil mababaw ang tubig at may bahura — kaya kinailangan nilang maglakad sa dagat.",
           en: "The big ships could not come close because the water was shallow and full of coral — so the men had to wade ashore.",
+        },
+        {
+          fil: "Kakaunti lang ang mga kawal ni Magellan na nakababa — kaya higit na marami ang mga mandirigma ni Lapu-Lapu laban sa kanila.",
+          en: "Only a few of Magellan's soldiers made it ashore — so Lapu-Lapu's warriors greatly outnumbered them.",
         },
         {
           fil: "Totoong pinuno ng Cebu si Rajah Humabon, at nakipagkasundo siya sa mga dayuhan.",
