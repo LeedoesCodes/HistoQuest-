@@ -52,6 +52,7 @@ export const MESSAGES = {
   "summary.deep": { fil: "Deep Learner", en: "Deep Learner" },
   "summary.surface": { fil: "Surface Learner", en: "Surface Learner" },
   "summary.back": { fil: "Bumalik sa menu", en: "Back to menu" },
+  "summary.stars": { fil: "Mga Bituin: {n}/{max}", en: "Stars: {n}/{max}" },
 
   // --- Mini-game placeholder ---
   "mg.placeholder.title": { fil: "Mini-game: {title}", en: "Mini-game: {title}" },
@@ -107,10 +108,12 @@ export const MESSAGES = {
     fil: "Pindutin ang mga sasakyang-dagat bago sila makalapag.",
     en: "Tap the boats before they land.",
   },
-  "mg.mactan.counter": {
-    fil: "Naitaboy: {repelled}   Nakalusot: {breached}   ({spawned}/{total})",
-    en: "Repelled: {repelled}   Landed: {breached}   ({spawned}/{total})",
-  },
+  "mg.mactan.wave": { fil: "Alon {n}/{total}", en: "Wave {n}/{total}" },
+  "mg.mactan.waveBanner": { fil: "Alon {n}!", en: "Wave {n}!" },
+  "mg.mactan.finalWave": { fil: "Huling Alon!", en: "Final Wave!" },
+  "mg.mactan.score": { fil: "Puntos: {n}", en: "Score: {n}" },
+  "mg.mactan.combo": { fil: "Sunod-sunod x{n}!", en: "Combo x{n}!" },
+  "mg.mactan.shore": { fil: "Baybayin", en: "Shore" },
   "mg.mactan.result": { fil: "Naitaboy mo ang {n} sasakyang-dagat!", en: "You repelled {n} boats!" },
   "mg.mactan.resultWin": {
     fil: "Walang nakalusot — matatag ang Mactan!",

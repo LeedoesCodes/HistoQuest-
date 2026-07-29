@@ -90,6 +90,53 @@ export function pop(
   });
 }
 
+/**
+ * Star rating (0–3) that pops in one at a time with a sound cue left to the
+ * caller. Returns the container so the caller can position/clean it up.
+ * The reward kids chase — used at the end of every mini-game.
+ */
+export function showStars(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  filled: number,
+  onEachStar?: (index: number) => void
+): Phaser.GameObjects.Container {
+  const layer = scene.add.container(x, y).setDepth(32);
+  const size = 46;
+  const gap = 54;
+  for (let i = 0; i < 3; i++) {
+    const sx = (i - 1) * gap;
+    const empty = scene.add
+      .text(sx, 0, "☆", { fontFamily: "sans-serif", fontSize: `${size}px`, color: "#5b6784" })
+      .setOrigin(0.5);
+    layer.add(empty);
+    if (i < filled) {
+      const star = scene.add
+        .text(sx, 0, "★", { fontFamily: "sans-serif", fontSize: `${size}px`, color: "#ffd54a" })
+        .setOrigin(0.5)
+        .setScale(0);
+      layer.add(star);
+      scene.tweens.add({
+        targets: star,
+        scale: 1,
+        duration: 260,
+        ease: "Back.easeOut",
+        delay: 250 + i * 320,
+        onStart: () => onEachStar?.(i),
+      });
+    }
+  }
+  return layer;
+}
+
+/** Map a 0..1 performance score to a 1–3 star rating. */
+export function starsFor(score: number): number {
+  if (score >= 0.85) return 3;
+  if (score >= 0.55) return 2;
+  return 1;
+}
+
 /** Floating text that drifts up and fades ("+1", "✓", "✗"). */
 export function floatText(
   scene: Phaser.Scene,

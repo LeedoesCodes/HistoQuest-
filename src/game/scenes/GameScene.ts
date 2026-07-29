@@ -14,7 +14,7 @@ import { playDecision } from "../presenters/decision";
 import { playQuiz } from "../presenters/quiz";
 import { getMiniGame } from "../presenters/miniGames";
 import { COLORS, FONT } from "../ui/theme";
-import { burst, pop } from "../ui/juice";
+import { burst, pop, showStars, starsFor } from "../ui/juice";
 import { sfx } from "../ui/sfx";
 import { L, t } from "../i18n";
 import { IMAGE_URLS } from "../assets/images";
@@ -131,7 +131,12 @@ export class GameScene extends Phaser.Scene {
     void logger.flush(); // best-effort sync (no-op offline / without Supabase)
     this.game.events.emit("arc-finished", result);
 
-    await this.showSummary(pre.score, post.score, engagement.label, engagement.confidence);
+    // Tally stars earned across the arc's mini-games (the reward kids chase).
+    const mgScores = events.filter((e) => e.type === "minigame_complete");
+    const earnedStars = mgScores.reduce((n, e) => n + starsFor(Number(e.payload.score)), 0);
+    const maxStars = mgScores.length * 3;
+
+    await this.showSummary(pre.score, post.score, engagement.label, engagement.confidence, earnedStars, maxStars);
     chrome.destroy(true);
     backdrop.destroy(true);
   }
@@ -181,7 +186,9 @@ export class GameScene extends Phaser.Scene {
     preScore: number,
     postScore: number,
     label: string,
-    confidence: number
+    confidence: number,
+    earnedStars: number,
+    maxStars: number
   ): Promise<void> {
     return new Promise((resolve) => {
       const { width, height } = this.scale;
@@ -199,7 +206,7 @@ export class GameScene extends Phaser.Scene {
 
       layer.add([
         this.add
-          .text(width / 2, height / 2 - 80, t("summary.title"), {
+          .text(width / 2, height / 2 - 150, t("summary.title"), {
             fontFamily: FONT,
             fontSize: "28px",
             color: COLORS.text,
@@ -207,9 +214,16 @@ export class GameScene extends Phaser.Scene {
           })
           .setOrigin(0.5),
         this.add
+          .text(width / 2, height / 2 - 58, t("summary.stars", { n: earnedStars, max: maxStars }), {
+            fontFamily: FONT,
+            fontSize: "15px",
+            color: COLORS.textMuted,
+          })
+          .setOrigin(0.5),
+        this.add
           .text(
             width / 2,
-            height / 2 - 30,
+            height / 2 - 22,
             t("summary.learned", { pre: pct(preScore), post: pct(postScore), gain: gainText }),
             { fontFamily: FONT, fontSize: "18px", color: COLORS.accentText }
           )
@@ -217,7 +231,7 @@ export class GameScene extends Phaser.Scene {
         this.add
           .text(
             width / 2,
-            height / 2 + 2,
+            height / 2 + 10,
             t("summary.engagement", { label: labelText, pct: Math.round(confidence * 100) }),
             { fontFamily: FONT, fontSize: "18px", color: COLORS.textMuted }
           )
@@ -232,10 +246,16 @@ export class GameScene extends Phaser.Scene {
           .setOrigin(0.5),
       ]);
 
+      // Headline 3-star arc rating from the mini-game star tally.
+      if (maxStars > 0) {
+        const arcStars = starsFor(earnedStars / maxStars);
+        layer.add(showStars(this, width / 2, height / 2 - 105, arcStars, () => sfx.pop()));
+      }
+
       // Celebrate an improvement from pre-test to post-test.
       if (gain > 0) {
         sfx.success();
-        this.time.delayedCall(220, () => burst(this, width / 2, height / 2 - 30, [0xffd54a, 0x8bc34a, 0xffffff], 34, 260));
+        this.time.delayedCall(600, () => burst(this, width / 2, height / 2 - 105, [0xffd54a, 0x8bc34a, 0xffffff], 30, 240));
       }
 
       btn.on("pointerdown", () => {
