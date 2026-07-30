@@ -57,20 +57,28 @@ for (let i = 0; i < 34; i++) {
 }
 await shot("03-into-game.png");
 
-// Drive the avatar with real arrow keys — real rAF, correct speed.
+// Drive the side-view avatar with real keys — real rAF, correct speed.
 async function press(key, ms) {
   await page.keyboard.down(key);
   await sleep(ms);
   await page.keyboard.up(key);
 }
-await press("ArrowRight", 900);
-await shot("04-move-right.png");
-await press("ArrowUp", 500);
-await press("ArrowRight", 700);
-await shot("05-combat.png");
-await press("ArrowDown", 700);
 await press("ArrowRight", 800);
-await shot("06-combat2.png");
+await shot("04-walk.png");
+await press("ArrowUp", 120); // jump
+await sleep(250);
+await shot("05-jump.png");
+await page.keyboard.down("ArrowDown"); // crouch
+await sleep(300);
+await shot("06-crouch.png");
+await page.keyboard.up("ArrowDown");
+await press("Space", 120); // attack
+await sleep(120);
+await shot("07-attack.png");
+await press("ArrowRight", 500);
+await press("Space", 120);
+await sleep(600);
+await shot("08-combat.png");
 
 console.log("--- console tail ---");
 console.log(logs.slice(-12).join("\n"));
