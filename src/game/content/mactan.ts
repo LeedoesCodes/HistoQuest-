@@ -263,6 +263,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s3a",
       type: "story",
+      speaker: { name: { fil: "Rajah Humabon", en: "Rajah Humabon" }, image: "mactan/char_humabon", side: "right" },
       text: {
         fil:
           "Sa kabilang pulo, sa Cebu, may pinuno — si Rajah Humabon.\n" +
@@ -291,6 +292,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s4a",
       type: "story",
+      speaker: { name: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" }, image: "mactan/char_magellan", side: "right" },
       text: {
         fil:
           "Dumating ang mensahe sa Mactan.\n" +
@@ -305,6 +307,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s4b",
       type: "story",
+      speaker: { name: { fil: "Lapu-Lapu", en: "Lapu-Lapu" }, image: "mactan/char_lapulapu", side: "left" },
       text: {
         fil:
           "Tumayo si Lapu-Lapu sa harap ng mga tao.\n" +
@@ -333,6 +336,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s5a",
       type: "story",
+      speaker: { name: { fil: "Lapu-Lapu", en: "Lapu-Lapu" }, image: "mactan/char_lapulapu", side: "left" },
       text: {
         fil:
           "Ngunit hindi lakas ang plano ni Lapu-Lapu. Talino.\n" +
@@ -347,6 +351,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s5b",
       type: "story",
+      speaker: { name: { fil: "Lapu-Lapu", en: "Lapu-Lapu" }, image: "mactan/char_lapulapu", side: "left" },
       text: {
         fil:
           "“Hindi sila makakalapit. Kailangan nilang maglakad sa dagat.”\n" +

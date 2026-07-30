@@ -120,6 +120,20 @@ export interface StoryNode {
   image?: string;
   /** Voiceover audio key (edge-tts MP3s, later). Optional. */
   vo?: string;
+  /**
+   * When set, a character portrait pops in (with a shake + sound) while this
+   * beat is shown — a speaker for the line. Degrades gracefully if the image
+   * hasn't shipped (just the name shows).
+   */
+  speaker?: StorySpeaker;
+}
+
+export interface StorySpeaker {
+  name: LocalizedText;
+  /** Portrait image key (e.g. "mactan/char_lapulapu"). */
+  image: string;
+  /** Which side the portrait pops in on. Default "left". */
+  side?: "left" | "right";
 }
 
 /**

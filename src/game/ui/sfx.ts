@@ -175,6 +175,11 @@ export const sfx = {
   thud: () => tone(90, 0.28, "sine", 0.07),
   /** Tearing the cedula. */
   tear: () => noise(0.32, 0.08, 900),
+  /** A character portrait popping in to speak — a soft rising thump. */
+  voice: () => {
+    tone(300, 0.09, "sine", 0.05);
+    tone(200, 0.12, "sine", 0.04, 0.03);
+  },
   /** A key press while text types itself in. */
   key: () => keyPress(),
   /**

@@ -89,6 +89,45 @@ export function playStory(scene: Phaser.Scene, node: StoryNode): Promise<void> {
 
     layer.add([box, text, hint]);
 
+    // --- Speaker portrait: pops in with a shake + sound when set ---
+    if (node.speaker && hasImage(node.speaker.image) && scene.textures.exists(node.speaker.image)) {
+      const sp = node.speaker;
+      const side = sp.side ?? "left";
+      const panelTop = panelY - panelH / 2;
+      const portraitH = Math.min(panelTop - 14, 330);
+      const sx = side === "left" ? 132 : width - 132;
+
+      const spLayer = scene.add.container(sx, 0).setDepth(9);
+      const img = scene.add.image(0, panelTop + 6, sp.image).setOrigin(0.5, 1);
+      img.setScale(portraitH / img.height);
+      const nameTxt = scene.add
+        .text(0, panelTop - 2, L(sp.name), { fontFamily: FONT, fontSize: "15px", color: "#0a0f1c", fontStyle: "bold" })
+        .setOrigin(0.5, 1);
+      const nameBg = scene.add
+        .rectangle(0, panelTop - 1, nameTxt.width + 20, 24, COLORS.accent, 0.95)
+        .setStrokeStyle(2, 0x8a6d3b)
+        .setOrigin(0.5, 1);
+      spLayer.add([img, nameBg, nameTxt]);
+      layer.add(spLayer);
+
+      // Pop in from just below, then a quick shake — the "they're speaking" beat.
+      spLayer.setAlpha(0).setScale(0.9);
+      spLayer.y = 26;
+      sfx.voice();
+      scene.tweens.add({
+        targets: spLayer,
+        alpha: 1,
+        scaleX: 1,
+        scaleY: 1,
+        y: 0,
+        duration: 260,
+        ease: "Back.easeOut",
+        onComplete: () => {
+          scene.tweens.add({ targets: spLayer, x: sx + 5, duration: 45, yoyo: true, repeat: 3, onComplete: () => (spLayer.x = sx) });
+        },
+      });
+    }
+
     // --- Typewriter ---
     let revealed = 0;
     let complete = false;
