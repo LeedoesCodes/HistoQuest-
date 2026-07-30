@@ -3,6 +3,7 @@ import type { StoryNode } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
 import { L, t } from "../i18n";
 import { sfx } from "../ui/sfx";
+import { makePanel } from "../ui/panel";
 import { hasImage } from "../assets/images";
 
 /**
@@ -71,9 +72,7 @@ export function playStory(scene: Phaser.Scene, node: StoryNode): Promise<void> {
     }
 
     const panelY = height - panelH / 2 - 20;
-    const box = scene.add
-      .rectangle(width / 2, panelY, width - 40, panelH, COLORS.panel, 0.96)
-      .setStrokeStyle(2, COLORS.panelStroke);
+    const box = makePanel(scene, width / 2, panelY, width - 40, panelH);
 
     text.setPosition(20 + PADDING_X, panelY - panelH / 2 + PADDING_TOP);
     text.setText(""); // start empty; the typewriter fills it
