@@ -22,6 +22,11 @@ export function playCharacter(scene: Phaser.Scene, node: CharacterNode): Promise
     const layer = scene.add.container(0, 0).setDepth(18);
     const isReal = node.historicity === "real";
 
+    // Dim the arc backdrop so the portrait, name and bio always read clearly
+    // over any scene (without art, the generated backdrop's sun/palm bled
+    // through the text). Part of the layer, so it's cleaned up on exit.
+    layer.add(scene.add.rectangle(width / 2, height / 2, width, height, 0x0a0f1c, 0.5));
+
     // --- Portrait: real art if it has shipped, placeholder plate if not ---
     const portraitX = 150;
     const portraitY = height / 2 - 30;

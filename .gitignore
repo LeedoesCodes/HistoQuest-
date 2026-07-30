@@ -6,3 +6,6 @@ dist-ssr
 .env.local
 .DS_Store
 *.log
+
+# Playwright screenshot output
+shots/

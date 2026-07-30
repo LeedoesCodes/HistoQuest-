@@ -44,23 +44,49 @@ merges with the reading modules + teacher dashboard via shared contracts.
 - `src/game/presenters/*` — every screen (arcSelect, story, decision, quiz) and
   `presenters/miniGames/*` (registry keyed by the content's `key`).
 
-**Presenter rule (important):** a presenter must draw into a container it
-creates on entry and destroys on exit, and resolve a Promise when done. Drawing
-straight onto the scene leaks UI onto the next screen — this has bitten twice
-(quiz header, code-unscramble instructions).
+**Presenter rule (CRITICAL — has bitten 4×).** EVERY object a presenter or
+mini-game creates (`scene.add.*`) MUST be added to a container that is destroyed
+on exit — AND every `scene.input.on(...)` / `scene.events.on(...)` listener and
+every DEV `window.*` hook MUST be removed on exit. Drawing/binding straight onto
+the scene leaks onto the next screen. Prior leaks: quiz header, code-unscramble
+instructions, mactan HUD bar backgrounds, mactan joystick input handlers.
+Checklist before finishing any presenter:
+1. Is every `scene.add.*` inside a container you `.destroy(true)`?
+2. Is every `scene.input.on` / `scene.events.on` paired with an `.off` on exit?
+3. Any `(window as any).__x` dev hook `delete`d on exit?
 
-## Testing gotcha (cost hours once)
+## Seeing the game (Playwright screenshots) — preferred verification
 
-Phaser drives everything from `requestAnimationFrame`. If the preview tab is
-hidden (`document.visibilityState === "hidden"`), rAF never fires, so the scene
-clock, timers, and tweens are all frozen — while synthetic `obj.emit(...)` still
-works because it bypasses the loop. Symptoms look like game bugs (scenes stuck
-at INIT, spawners not spawning). To test in a hidden tab, pump frames manually:
+`scripts/shoot.mjs` drives the game in a REAL headless Chromium (real rAF, so
+tweens/movement run at correct speed — unlike frame-pumping) and writes PNGs you
+can open with the Read tool. This is the way to catch layout/readability bugs
+(text over backdrop, leaked UI) that object-tree inspection cannot see.
+
+```bash
+npm run build && (npx vite preview --port 4174 &) && sleep 3
+node scripts/shoot.mjs <outDir> http://localhost:4174
+```
+
+Then Read the PNGs. Drive with real `page.keyboard`/`page.mouse`; tap the canvas
+via the game→screen coord mapping in the script. ALWAYS look at a screenshot
+after a visual change — a passing object-tree check is not proof it looks right.
+
+## Testing gotcha — frame-pumping (fallback when you can't screenshot)
+
+Phaser drives everything from `requestAnimationFrame`. In a hidden/non-rendering
+tab rAF never fires, so the scene clock, timers, and tweens freeze — while
+synthetic `obj.emit(...)` still works because it bypasses the loop. Symptoms look
+like game bugs (scenes stuck at INIT, spawners not spawning). Pump frames:
 
 ```js
 let t = performance.now();
 for (let i = 0; i < 15; i++) { t += 16.7; game.step(t, 16.7); }
 ```
+
+NOTE: under manual pumping, `scene.time` events advance but **tween movement
+runs at the wrong speed** — so verify movement/positions with a real screenshot,
+or with logic in a `scene.events.on('update')` handler (which uses the delta you
+pass to `game.step`).
 
 ## Art assets (additive — never required)
 

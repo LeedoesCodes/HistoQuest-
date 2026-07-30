@@ -106,6 +106,9 @@ export function playMactanDefense(
     const shots: Shot[] = [];
 
     const field = scene.add.container(0, 0).setDepth(10);
+    // Dim the arc backdrop so the warriors, enemies and shots pop against it —
+    // the generated dusk scene (sun, palm) was competing with the sprites.
+    field.add(scene.add.rectangle(width / 2, height / 2, width, height, 0x0a1420, 0.55));
     const hud = scene.add.container(0, 0).setDepth(14);
     const controls = scene.add.container(0, 0).setDepth(15);
     const overlay = scene.add.container(0, 0).setDepth(20);
