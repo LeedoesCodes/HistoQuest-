@@ -3,6 +3,7 @@ import type { ArcId, Language, LocalizedText } from "@shared/types";
 import { getArcContent } from "../content";
 import { COLORS, FONT } from "../ui/theme";
 import { pop } from "../ui/juice";
+import { makeButton } from "../ui/panel";
 import { sfx } from "../ui/sfx";
 import { L, t, getLanguage, setLanguage } from "../i18n";
 
@@ -54,12 +55,9 @@ export function playArcSelect(scene: Phaser.Scene): Promise<ArcId> {
       ARCS.forEach((arc, i) => {
         const y = 168 + i * 108;
         const cardW = Math.min(520, width - 60);
-        const card = scene.add
-          .rectangle(width / 2, y, cardW, 88, COLORS.panel)
-          .setStrokeStyle(2, COLORS.panelStroke)
-          .setInteractive({ useHandCursor: true });
+        const { container: card, zone } = makeButton(scene, width / 2, y, cardW, 88, { radius: 14 });
         const title = scene.add
-          .text(width / 2 - cardW / 2 + 24, y - 16, L(getArcContent(arc.id).title), {
+          .text(-cardW / 2 + 24, -16, L(getArcContent(arc.id).title), {
             fontFamily: FONT,
             fontSize: "23px",
             color: COLORS.text,
@@ -67,16 +65,16 @@ export function playArcSelect(scene: Phaser.Scene): Promise<ArcId> {
           })
           .setOrigin(0, 0.5);
         const sub = scene.add
-          .text(width / 2 - cardW / 2 + 24, y + 16, L(arc.subtitle), {
+          .text(-cardW / 2 + 24, 16, L(arc.subtitle), {
             fontFamily: FONT,
             fontSize: "14px",
             color: COLORS.textMuted,
           })
           .setOrigin(0, 0.5);
+        card.add([title, sub]);
+        layer.add(card);
 
-        card.on("pointerover", () => card.setFillStyle(COLORS.panelHover));
-        card.on("pointerout", () => card.setFillStyle(COLORS.panel));
-        card.on("pointerdown", () => {
+        zone.on("pointerdown", () => {
           if (settled) return;
           settled = true;
           sfx.tap();
@@ -87,8 +85,6 @@ export function playArcSelect(scene: Phaser.Scene): Promise<ArcId> {
             resolve(arc.id);
           });
         });
-
-        layer.add([card, title, sub]);
       });
 
       // --- Language toggle ---
@@ -104,27 +100,26 @@ export function playArcSelect(scene: Phaser.Scene): Promise<ArcId> {
       );
       LANGS.forEach((lang, i) => {
         const active = getLanguage() === lang.id;
-        const x = width / 2 - 80 + i * 110;
-        const btn = scene.add
-          .rectangle(x + 45, toggleY, 100, 34, active ? COLORS.panelHover : COLORS.panel)
-          .setStrokeStyle(2, active ? COLORS.accent : COLORS.panelStroke)
-          .setInteractive({ useHandCursor: true });
+        const x = width / 2 - 80 + i * 110 + 45;
+        const { container: btn, zone, setActive } = makeButton(scene, x, toggleY, 100, 34, { radius: 8 });
+        setActive(active);
         const label = scene.add
-          .text(x + 45, toggleY, lang.label, {
+          .text(0, 0, lang.label, {
             fontFamily: FONT,
             fontSize: "14px",
             color: active ? COLORS.accentText : COLORS.textMuted,
             fontStyle: active ? "bold" : "normal",
           })
           .setOrigin(0.5);
-        btn.on("pointerdown", () => {
+        btn.add(label);
+        zone.on("pointerdown", () => {
           if (settled || getLanguage() === lang.id) return;
           sfx.tap();
           setLanguage(lang.id);
           render(); // rebuild this screen in the new language
         });
-        btn.setData("lang", lang.id); // for tests
-        layer.add([btn, label]);
+        zone.setData("lang", lang.id); // for tests
+        layer.add(btn);
       });
     };
 

@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import type { AssessmentPhase, QuizQuestion, QuizResult } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
 import { pop } from "../ui/juice";
+import { makeButton } from "../ui/panel";
 import { sfx } from "../ui/sfx";
 import { L, t } from "../i18n";
 
@@ -22,24 +23,19 @@ export function playQuiz(
   contextTitle?: string
 ): Promise<QuizResult> {
   return new Promise((resolve) => {
-    const { width } = scene.scale;
+    const { width, height } = scene.scale;
+    void contextTitle; // arc name already shown by the scene chrome
     const answers: Record<string, string> = {};
+
+    // Dim the arc backdrop so the question + choices read clearly. Behind both
+    // the header and the per-question layer; destroyed when the quiz ends.
+    const scrim = scene.add.rectangle(width / 2, height / 2, width, height, 0x0a0f1c, 0.5).setDepth(13);
+
     const layer = scene.add.container(0, 0).setDepth(15);
 
     // Header (phase + subtitle) — its own container so it survives the
     // per-question re-render but is cleaned up when the quiz ends.
     const headerLayer = scene.add.container(0, 0).setDepth(15);
-    if (contextTitle) {
-      headerLayer.add(
-        scene.add
-          .text(width / 2, 20, contextTitle, {
-            fontFamily: FONT,
-            fontSize: "14px",
-            color: COLORS.textMuted,
-          })
-          .setOrigin(0.5)
-      );
-    }
     headerLayer.add([
       scene.add
         .text(width / 2, 46, t(phase === "pre" ? "quiz.pre.title" : "quiz.post.title"), {
@@ -89,12 +85,9 @@ export function playQuiz(
       const startY = 250;
       q.choices.forEach((choice, i) => {
         const y = startY + i * 66;
-        const btn = scene.add
-          .rectangle(width / 2, y, btnW, 54, COLORS.panel)
-          .setStrokeStyle(2, COLORS.panelStroke)
-          .setInteractive({ useHandCursor: true });
+        const { container: btn, zone } = makeButton(scene, width / 2, y, btnW, 54);
         const label = scene.add
-          .text(width / 2, y, L(choice.label), {
+          .text(0, 0, L(choice.label), {
             fontFamily: FONT,
             fontSize: "19px",
             color: COLORS.text,
@@ -102,10 +95,10 @@ export function playQuiz(
             wordWrap: { width: btnW - 40 },
           })
           .setOrigin(0.5);
+        btn.add(label);
+        layer.add(btn);
 
-        btn.on("pointerover", () => btn.setFillStyle(COLORS.panelHover));
-        btn.on("pointerout", () => btn.setFillStyle(COLORS.panel));
-        btn.on("pointerdown", () => {
+        zone.on("pointerdown", () => {
           sfx.tap();
           pop(scene, btn);
           answers[q.id] = choice.id;
@@ -116,7 +109,6 @@ export function playQuiz(
             else finish();
           });
         });
-        layer.add([btn, label]);
       });
     };
 
@@ -125,6 +117,7 @@ export function playQuiz(
         (n, q) => n + (answers[q.id] === q.correctChoiceId ? 1 : 0),
         0
       );
+      scrim.destroy();
       headerLayer.destroy(true);
       layer.destroy(true);
       resolve({

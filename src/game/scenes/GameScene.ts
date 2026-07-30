@@ -15,6 +15,7 @@ import { playQuiz } from "../presenters/quiz";
 import { getMiniGame } from "../presenters/miniGames";
 import { COLORS, FONT } from "../ui/theme";
 import { burst, pop, showStars, starsFor } from "../ui/juice";
+import { makePanel, makeButton } from "../ui/panel";
 import { sfx } from "../ui/sfx";
 import { L, t } from "../i18n";
 import { IMAGE_URLS } from "../assets/images";
@@ -199,10 +200,14 @@ export class GameScene extends Phaser.Scene {
         gain > 0 ? `+${pct(gain)} ↑` : gain < 0 ? `${pct(gain)} ↓` : t("summary.noChange");
 
       const layer = this.add.container(0, 0).setDepth(20);
-      const btn = this.add
-        .rectangle(width / 2, height / 2 + 80, 220, 52, COLORS.panel)
-        .setStrokeStyle(2, COLORS.panelStroke)
-        .setInteractive({ useHandCursor: true });
+      // A styled panel behind the summary so it reads over the arc background.
+      layer.add(makePanel(this, width / 2, height / 2 - 40, 460, 300, { alpha: 0.9 }));
+      const { container: btn, zone } = makeButton(this, width / 2, height / 2 + 80, 220, 52);
+      btn.add(
+        this.add
+          .text(0, 0, t("summary.back"), { fontFamily: FONT, fontSize: "16px", color: COLORS.text })
+          .setOrigin(0.5)
+      );
 
       layer.add([
         this.add
@@ -237,13 +242,6 @@ export class GameScene extends Phaser.Scene {
           )
           .setOrigin(0.5),
         btn,
-        this.add
-          .text(width / 2, height / 2 + 80, t("summary.back"), {
-            fontFamily: FONT,
-            fontSize: "16px",
-            color: COLORS.text,
-          })
-          .setOrigin(0.5),
       ]);
 
       // Headline 3-star arc rating from the mini-game star tally.
@@ -258,7 +256,7 @@ export class GameScene extends Phaser.Scene {
         this.time.delayedCall(600, () => burst(this, width / 2, height / 2 - 105, [0xffd54a, 0x8bc34a, 0xffffff], 30, 240));
       }
 
-      btn.on("pointerdown", () => {
+      zone.on("pointerdown", () => {
         sfx.tap();
         pop(this, btn);
         this.time.delayedCall(120, () => {

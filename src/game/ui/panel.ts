@@ -38,3 +38,51 @@ export function makePanel(
 
   return g;
 }
+
+/**
+ * A styled, interactive button matching the panels. Self-contained in a
+ * container positioned at (cx, cy) with children drawn around a LOCAL centre,
+ * so it can be safely popped/scaled. Returns the container (add it to your
+ * layer), the interactive `zone` (wire `pointerdown` on it), and `setActive`
+ * for a persistent selected look (e.g. the language toggle).
+ *
+ * Add your own label into `container` at local (0, 0) so it pops with the button.
+ */
+export function makeButton(
+  scene: Phaser.Scene,
+  cx: number,
+  cy: number,
+  w: number,
+  h: number,
+  opts: { radius?: number; tone?: "wood" | "danger" | "go" } = {}
+): {
+  container: Phaser.GameObjects.Container;
+  zone: Phaser.GameObjects.Rectangle;
+  setActive: (on: boolean) => void;
+} {
+  const r = opts.radius ?? 12;
+  const border = opts.tone === "danger" ? 0xe4572e : opts.tone === "go" ? 0x4caf50 : 0x8a6d3b;
+  const container = scene.add.container(cx, cy);
+
+  const base = scene.add.graphics();
+  base.fillStyle(0x241a0f, 0.9);
+  base.fillRoundedRect(-w / 2, -h / 2, w, h, r);
+  base.lineStyle(2, border, 1);
+  base.strokeRoundedRect(-w / 2, -h / 2, w, h, r);
+
+  const hi = scene.add.graphics().setVisible(false);
+  hi.fillStyle(0xffd54a, 0.16);
+  hi.fillRoundedRect(-w / 2, -h / 2, w, h, r);
+
+  const active = scene.add.graphics().setVisible(false);
+  active.lineStyle(2, 0xffd54a, 1);
+  active.strokeRoundedRect(-w / 2 + 2, -h / 2 + 2, w - 4, h - 4, r - 2);
+
+  const zone = scene.add.rectangle(0, 0, w, h, 0xffffff, 0.001).setInteractive({ useHandCursor: true });
+  container.add([base, hi, active, zone]);
+
+  zone.on("pointerover", () => hi.setVisible(true));
+  zone.on("pointerout", () => hi.setVisible(false));
+
+  return { container, zone, setActive: (on: boolean) => active.setVisible(on) };
+}

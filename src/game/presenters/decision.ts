@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import type { DecisionNode, DecisionResult } from "../content/types";
 import { COLORS, FONT } from "../ui/theme";
 import { pop } from "../ui/juice";
+import { makeButton } from "../ui/panel";
 import { sfx } from "../ui/sfx";
 import { L } from "../i18n";
 
@@ -14,10 +15,13 @@ import { L } from "../i18n";
  */
 export function playDecision(scene: Phaser.Scene, node: DecisionNode): Promise<DecisionResult> {
   return new Promise((resolve) => {
-    const { width } = scene.scale;
+    const { width, height } = scene.scale;
     const layer = scene.add.container(0, 0).setDepth(10);
     const startedAt = performance.now();
     let done = false;
+
+    // Dim the backdrop so the prompt + choices read clearly over any scene.
+    layer.add(scene.add.rectangle(width / 2, height / 2, width, height, 0x0a0f1c, 0.5));
 
     // Prompt
     const prompt = scene.add
@@ -67,12 +71,9 @@ export function playDecision(scene: Phaser.Scene, node: DecisionNode): Promise<D
     const startY = 250;
     node.choices.forEach((choice, i) => {
       const y = startY + i * 84;
-      const btn = scene.add
-        .rectangle(width / 2, y, btnW, 68, COLORS.panel)
-        .setStrokeStyle(2, COLORS.panelStroke)
-        .setInteractive({ useHandCursor: true });
+      const { container: btn, zone } = makeButton(scene, width / 2, y, btnW, 68);
       const label = scene.add
-        .text(width / 2, y, L(choice.label), {
+        .text(0, 0, L(choice.label), {
           fontFamily: FONT,
           fontSize: "20px",
           color: COLORS.text,
@@ -80,10 +81,10 @@ export function playDecision(scene: Phaser.Scene, node: DecisionNode): Promise<D
           wordWrap: { width: btnW - 40 },
         })
         .setOrigin(0.5);
+      btn.add(label);
+      layer.add(btn);
 
-      btn.on("pointerover", () => btn.setFillStyle(COLORS.panelHover));
-      btn.on("pointerout", () => btn.setFillStyle(COLORS.panel));
-      btn.on("pointerdown", () => {
+      zone.on("pointerdown", () => {
         if (done) return;
         sfx.tap();
         pop(scene, btn);
@@ -95,7 +96,6 @@ export function playDecision(scene: Phaser.Scene, node: DecisionNode): Promise<D
           scene.time.delayedCall(90, () => finish(choice.id, false));
         }
       });
-      layer.add([btn, label]);
     });
 
     /** Brief in-character reply after a choice, then continue. */
