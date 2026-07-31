@@ -219,9 +219,10 @@ e.g. Magellan's journey across the world — instead of one fixed arc background
   Magellan backstory now reads departure → storms → open ocean.
 
 **Art:** the 8 `mactan/scene_*.png` backgrounds are speced in
-`docs/asset-brief.md §5b` but **not yet produced** — the game falls back to
-`mactan/bg.png` for every beat until they land (verified). Producing them is the
-remaining step; nothing else is needed to make the slideshow appear.
+`docs/asset-brief.md §5b` and **now produced** — generated via Gamelab (pixel-art,
+1600×896, all <130 KB) to match `bg.png`'s golden-hour style, then verified
+in-browser with `scripts/shoot_intro.mjs`. The Gamelab project is #12248. The
+fallback path still holds if a file is ever removed.
 
 **Verify:** `node scripts/shoot_intro.mjs <outDir>` walks the intro beat-by-beat.
 
