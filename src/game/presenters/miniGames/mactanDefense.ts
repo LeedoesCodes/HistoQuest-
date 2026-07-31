@@ -72,6 +72,22 @@ const ALLY_SPEED = 120;
 const ALLY_FLOOR = Math.ceil(ENEMY_HP * 0.25); // ~9 — allies can't chip below this
 const ALLY_STAGGER = 520;      // ms an ally is stunned after soaking a hit
 
+// Skills (Feature E).
+// DASH: a quick i-frame lunge — GUARANTEED to phase through bullets for its
+// window (kid-fair, per Lee: no random dodge chance). Short cooldown.
+const DASH_SPEED = 640;
+const DASH_DUR = 175;   // ms of movement + i-frames
+const DASH_CD = 700;
+// HEAVY: hold the attack to charge, release for a lunging high-damage strike.
+// Long charge + long cooldown + you're rooted while winding up = the risk.
+const CHARGE_MIN = 300; // hold ≥ this for a heavy; a quicker tap is a normal hit
+const CHARGE_MAX = 900; // fully charged (visual cap)
+const HEAVY_DMG = 40;   // one solid hit ends most soldiers
+const HEAVY_CD = 1600;
+const HEAVY_RANGE = 76; // wider reach than a normal swing (58)
+const HEAVY_LUNGE = 74; // forward step on release
+const HEAVY_KNOCK = 480;
+
 type ShotKind = "high" | "low";
 /**
  * Shot heights above the feet (groundY). Derived from the ~0.72-scaled kid
@@ -201,6 +217,14 @@ export function playMactanDefense(
     // player physics state
     let px = 150, py = groundY, pvy = 0, grounded = true, facing = 1, crouching = false;
     let walkPhase = 0;
+    // skills (Feature E): dash i-frames + charged heavy
+    let dashCd = 0, dashTime = 0, heavyCd = 0, charging = false, chargeStart = 0;
+    let dashQueued = false, heavyQueued = false;
+
+    // Charge-up ring for the heavy attack — grows while you hold, gold once it
+    // has passed the heavy threshold. Hidden otherwise. Part of the player rig.
+    const chargeRing = scene.add.circle(0, -80, 5, 0x000000, 0).setStrokeStyle(3, 0xffd54a, 0.9).setVisible(false);
+    player.add(chargeRing);
 
     // ---------------- HUD ----------------
     hud.add([
@@ -226,13 +250,22 @@ export function playMactanDefense(
     // ---------------- INPUT ----------------
     // Keyboard: move A/D or ←/→, jump W/↑/Space, crouch S/↓/Ctrl, attack F or
     // left-click. Touch: the on-screen buttons below.
-    const keys = scene.input.keyboard?.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,SPACE,F,CTRL") as Record<string, Phaser.Input.Keyboard.Key> | undefined;
-    // Capture these so Space/arrows don't scroll the page and Ctrl doesn't fire
-    // browser shortcuts while playing. Released again in finish().
-    scene.input.keyboard?.addCapture("SPACE,CTRL,UP,DOWN,LEFT,RIGHT");
+    const keys = scene.input.keyboard?.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,SPACE,F,CTRL,SHIFT") as Record<string, Phaser.Input.Keyboard.Key> | undefined;
+    // Capture these so Space/arrows don't scroll the page and Ctrl/Shift don't
+    // fire browser shortcuts while playing. Released again in finish().
+    scene.input.keyboard?.addCapture("SPACE,CTRL,SHIFT,UP,DOWN,LEFT,RIGHT");
     const held = { left: false, right: false, crouch: false };
     let jumpQueued = false;
     let attackQueued = false;
+
+    // Attack is press-and-hold: a quick tap is a normal swing, a held press
+    // charges the heavy (resolved on release). Dash is a discrete trigger.
+    const beginCharge = () => { if (!done && !charging && dashTime <= 0) { charging = true; chargeStart = performance.now(); } };
+    const releaseCharge = () => {
+      if (!charging) return;
+      charging = false;
+      if (performance.now() - chargeStart >= CHARGE_MIN) heavyQueued = true; else attackQueued = true;
+    };
 
     // On-screen buttons — touch only. Tracked so their input can be toggled with
     // visibility (invisible objects still receive input in Phaser).
@@ -250,7 +283,9 @@ export function playMactanDefense(
     mkButton(108, height - 52, 26, "▶", 0x3d5a99, () => (held.right = true), () => (held.right = false));
     mkButton(width - 118, height - 52, 26, "⤒", 0x4caf50, () => (jumpQueued = true));
     mkButton(width - 60, height - 90, 24, "⤓", 0x4fc3f7, () => (held.crouch = true), () => (held.crouch = false));
-    mkButton(width - 52, height - 44, 30, t("mg.mactan.attack"), 0xe4572e, () => (attackQueued = true));
+    mkButton(width - 122, height - 104, 23, "»", 0x9c6ade, () => (dashQueued = true)); // dash
+    // ATAKE: tap = normal swing, hold = charge the heavy (release to strike).
+    mkButton(width - 52, height - 44, 30, t("mg.mactan.attack"), 0xe4572e, beginCharge, releaseCharge);
 
     // --- desktop vs touch (adaptive) ---
     // Buttons start visible (mkButton). Hide them on a hover + fine-pointer
@@ -271,17 +306,26 @@ export function playMactanDefense(
       window.matchMedia?.("(hover: hover) and (pointer: fine)").matches === true;
     setControlsShown(!prefersDesktop);
 
-    // Left-click attacks on desktop; a touch tap uses the ATAKE button instead.
+    // Desktop: hold left-click to charge / release to strike (F does the same);
+    // SHIFT dashes. Touch uses the on-screen buttons instead.
     const onPointerDown = (pointer: Phaser.Input.Pointer) => {
       if (pointer.wasTouch) { setControlsShown(true); return; }
       setControlsShown(false);
-      if (pointer.leftButtonDown()) attackQueued = true;
+      if (pointer.leftButtonDown()) beginCharge();
     };
+    const onPointerUp = (pointer: Phaser.Input.Pointer) => { if (!pointer.wasTouch) releaseCharge(); };
     const onPointerMove = (pointer: Phaser.Input.Pointer) => { if (!pointer.wasTouch) setControlsShown(false); };
     const onAnyKey = () => setControlsShown(false);
+    const onKeyFDown = () => beginCharge();
+    const onKeyFUp = () => releaseCharge();
+    const onKeyDash = () => { dashQueued = true; };
     scene.input.on("pointerdown", onPointerDown);
+    scene.input.on("pointerup", onPointerUp);
     scene.input.on("pointermove", onPointerMove);
     scene.input.keyboard?.on("keydown", onAnyKey);
+    scene.input.keyboard?.on("keydown-F", onKeyFDown);
+    scene.input.keyboard?.on("keyup-F", onKeyFUp);
+    scene.input.keyboard?.on("keydown-SHIFT", onKeyDash);
 
     // DEV hook so tests can drive without real input.
     if (import.meta.env.DEV) {
@@ -289,6 +333,11 @@ export function playMactanDefense(
         set: (o: Partial<{ left: boolean; right: boolean; crouch: boolean }>) => Object.assign(held, o),
         jump: () => (jumpQueued = true),
         attack: () => (attackQueued = true),
+        dash: () => (dashQueued = true),
+        heavy: () => (heavyQueued = true),
+        // Apply one hit through the real hurtPlayer path — no-ops during i-frames
+        // (invuln/dash). Lets a script assert the dash grants i-frames.
+        forceHit: () => hurtPlayer(SHOT_DMG, px + 40),
         // Deterministic dodge test: clear shots, drop a stationary shot at the
         // player's x/height so the next update's hitbox test alone decides
         // hit/miss. Lets a script assert crouch-clears-high / jump-clears-low.
@@ -300,7 +349,7 @@ export function playMactanDefense(
           field.add(c);
           shots.push({ c, vx: 0, kind });
         },
-        state: () => ({ playerHP, score, defeated, spawned, allies: allies.length, enemies: enemies.filter((e) => !e.dead).length, enemyHps: enemies.filter((e) => !e.dead).map((e) => Math.round(e.hp)), shots: shots.length, px: Math.round(px), py: Math.round(py), grounded, crouching }),
+        state: () => ({ playerHP, score, defeated, spawned, allies: allies.length, enemies: enemies.filter((e) => !e.dead).length, enemyHps: enemies.filter((e) => !e.dead).map((e) => Math.round(e.hp)), enemyXs: enemies.filter((e) => !e.dead).map((e) => Math.round(e.c.x)), shots: shots.length, px: Math.round(px), py: Math.round(py), grounded, crouching, dashing: dashTime > 0, dashCd: Math.round(dashCd), heavyCd: Math.round(heavyCd), charging }),
       };
     }
 
@@ -391,7 +440,7 @@ export function playMactanDefense(
     }
 
     function hurtPlayer(dmg: number, fromX: number) {
-      if (invuln > 0 || done) return;
+      if (invuln > 0 || dashTime > 0 || done) return; // dash = guaranteed i-frames
       playerHP -= dmg;
       combo = 0;
       invuln = INVULN_MS;
@@ -426,6 +475,8 @@ export function playMactanDefense(
       if (done) return;
       const dt = Math.min(deltaMs, 50) / 1000;
       if (invuln > 0) invuln -= deltaMs;
+      dashCd -= deltaMs;
+      heavyCd -= deltaMs;
       player.setAlpha(invuln > 0 && Math.floor(invuln / 90) % 2 === 0 ? 0.4 : 1);
 
       // --- input → intent ---
@@ -434,7 +485,6 @@ export function playMactanDefense(
         if (keys.A.isDown || keys.LEFT.isDown) moveDir -= 1;
         if (keys.D.isDown || keys.RIGHT.isDown) moveDir += 1;
         if (Phaser.Input.Keyboard.JustDown(keys.W) || Phaser.Input.Keyboard.JustDown(keys.UP) || Phaser.Input.Keyboard.JustDown(keys.SPACE)) jumpQueued = true;
-        if (Phaser.Input.Keyboard.JustDown(keys.F)) attackQueued = true;
       }
       if (held.left) moveDir -= 1;
       if (held.right) moveDir += 1;
@@ -442,12 +492,24 @@ export function playMactanDefense(
 
       if (moveDir !== 0) facing = moveDir;
 
-      // --- horizontal move (no move while crouching) ---
-      if (!crouching) px = Phaser.Math.Clamp(px + moveDir * MOVE_SPEED * dt, 20, width - 20);
-      if (moveDir !== 0 && grounded && !crouching) walkPhase += dt * 10; else walkPhase = 0;
+      // --- dash: a quick i-frame lunge in the facing direction ---
+      if (dashQueued && dashCd <= 0 && dashTime <= 0 && grounded && !crouching) {
+        dashTime = DASH_DUR; dashCd = DASH_CD; charging = false; // dashing cancels a charge
+        sfx.tap();
+        burst(scene, px, py - 30, [0x9c6ade, 0xffffff], 10, 170);
+      }
+      dashQueued = false;
+      const dashing = dashTime > 0;
+      if (dashing) { dashTime -= deltaMs; px = Phaser.Math.Clamp(px + facing * DASH_SPEED * dt, 20, width - 20); }
+      // A charge roots you (committed windup) and cancels crouch.
+      if (charging) { moveDir = 0; crouching = false; }
+
+      // --- horizontal move (no move while crouching / dashing / charging) ---
+      if (!crouching && !dashing && !charging) px = Phaser.Math.Clamp(px + moveDir * MOVE_SPEED * dt, 20, width - 20);
+      if (moveDir !== 0 && grounded && !crouching && !dashing && !charging) walkPhase += dt * 10; else walkPhase = 0;
 
       // --- jump / gravity ---
-      if (jumpQueued && grounded && !crouching) { pvy = -JUMP_V; grounded = false; }
+      if (jumpQueued && grounded && !crouching && !dashing && !charging) { pvy = -JUMP_V; grounded = false; }
       jumpQueued = false;
       pvy += GRAVITY * dt;
       py += pvy * dt;
@@ -467,9 +529,40 @@ export function playMactanDefense(
       }
       attackQueued = false;
 
+      // --- heavy attack (released from a charge): a lunging power strike ---
+      if (heavyQueued && heavyCd <= 0) {
+        heavyCd = HEAVY_CD;
+        attackActive = ATTACK_ACTIVE + 90;
+        const startX = px;
+        px = Phaser.Math.Clamp(px + facing * HEAVY_LUNGE, 20, width - 20);
+        shake(scene, 220, 0.01);
+        burst(scene, px + facing * 28, py - 30, [0xffd54a, 0xff8a3d, 0xffffff], 18, 260);
+        sfx.hit();
+        // The lunge SWEEPS forward: hit everything from the start point through
+        // the reach, so a close enemy isn't leapt over before the hit registers.
+        for (const e of enemies) {
+          if (e.dead) continue;
+          const dx = e.c.x - startX;
+          if (Math.sign(dx) === facing && Math.abs(dx) < HEAVY_LUNGE + HEAVY_RANGE && Math.abs(e.c.y - py) < 80) damageEnemy(e, HEAVY_DMG, startX, true, HEAVY_KNOCK);
+        }
+      }
+      heavyQueued = false;
+
       // --- draw player pose ---
       player.setPosition(px, py);
       player.setScale(facing, 1); // flips the whole rig (sprite + spear) to face left
+
+      // dash after-image: translucent during the i-frame lunge
+      if (dashing) player.setAlpha(0.6);
+      // charge ring: grows while held, turns gold once past the heavy threshold
+      if (charging) {
+        const frac = Math.min(1, (performance.now() - chargeStart) / CHARGE_MAX);
+        chargeRing.setVisible(true);
+        chargeRing.setRadius(5 + frac * 12);
+        chargeRing.setStrokeStyle(3, performance.now() - chargeStart >= CHARGE_MIN ? 0xffd54a : 0x9c6ade, 0.9);
+      } else if (chargeRing.visible) {
+        chargeRing.setVisible(false);
+      }
 
       if (hero) {
         // Animation state machine — priority: airborne > crouch > walk > idle.
@@ -625,9 +718,13 @@ export function playMactanDefense(
       // Remove input listeners BEFORE the results overlay so a click on it can't
       // fire a phantom attack; release the key captures we took.
       scene.input.off("pointerdown", onPointerDown);
+      scene.input.off("pointerup", onPointerUp);
       scene.input.off("pointermove", onPointerMove);
       scene.input.keyboard?.off("keydown", onAnyKey);
-      scene.input.keyboard?.removeCapture("SPACE,CTRL,UP,DOWN,LEFT,RIGHT");
+      scene.input.keyboard?.off("keydown-F", onKeyFDown);
+      scene.input.keyboard?.off("keyup-F", onKeyFUp);
+      scene.input.keyboard?.off("keydown-SHIFT", onKeyDash);
+      scene.input.keyboard?.removeCapture("SPACE,CTRL,SHIFT,UP,DOWN,LEFT,RIGHT");
       spawner?.remove();
       failsafe.remove();
       if (import.meta.env.DEV) delete (window as unknown as { __mg?: unknown }).__mg;

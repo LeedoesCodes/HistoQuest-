@@ -103,9 +103,22 @@ high over the bigger sprite (cosmetic).
 - Ally sprites can start as **tinted reuse** of existing hero/enemy art (code-art
   fallback holds); real ally sprites land in Feature G.
 
-## Feature E — skills: dash + charged heavy
-Add to the update loop (it already tracks `attackCd`; add `dashCd` + a charge
-state machine). Both are **sprite-gated** (Feature G) but work on code-art first.
+## Feature E — skills: dash + charged heavy. ✅ DONE 2026-07-31 (code-art; sprites in G)
+**Built:** DASH (SHIFT / `»` button / `__mg.dash`) — a `DASH_DUR`175ms lunge with
+GUARANTEED i-frames (`hurtPlayer` no-ops while `dashTime>0`), `DASH_CD`700ms,
+purple burst + translucent after-image. HEAVY — hold attack (F / left-click /
+ATAKE button) to charge; a growing gold charge-ring; release past `CHARGE_MIN`
+300ms for a rooted lunging strike (`HEAVY_DMG`40 one-shots a soldier), else a
+normal tap. The lunge **sweeps** (hits from the start point through the reach) —
+fixed a real bug where it leapt over a close enemy before the hit registered.
+Verified via `scripts/verify_combat_skills.mjs` (5/5: i-frames 88→88 during dash,
+cooldown, charging state, heavy finishes 0→3) + a charge-ring screenshot.
+DEV hooks added: `__mg.dash/heavy/forceHit`, state `dashing/dashCd/heavyCd/charging/enemyXs`.
+
+Polish for Feature G: charge-ring sits a touch high over the small kid; dash/heavy
+reuse existing anims (no dedicated dash/charge/heavy sheets yet).
+
+### Original design notes
 
 - **Dash:** short burst reposition with **guaranteed i-frames** for the dash
   window (locked decision #2), short cooldown. A readable third dodge option
