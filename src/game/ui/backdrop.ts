@@ -64,10 +64,13 @@ export function createBackdrop(scene: Phaser.Scene, arc: ArcId): Phaser.GameObje
   const key = arcBackgroundKey(arc);
   if (hasImage(key) && scene.textures.exists(key)) {
     const img = scene.add.image(width / 2, height / 2, key);
-    // Cover the stage without distorting the artwork.
-    const scale = Math.max(width / img.width, height / img.height);
-    img.setScale(scale);
+    // Cover the stage without distorting the artwork. A little overscan beyond
+    // cover leaves margin so the Ken Burns drift never reveals an edge.
+    const cover = Math.max(width / img.width, height / img.height);
+    const base = cover * 1.06;
+    img.setScale(base);
     layer.add(img);
+    addKenBurns(scene, img, layer, base, width, height);
   } else {
     layer.add(paintScene(scene, arc));
   }
@@ -75,6 +78,38 @@ export function createBackdrop(scene: Phaser.Scene, arc: ArcId): Phaser.GameObje
   // Keep text readable over whatever is behind it.
   layer.add(scene.add.rectangle(width / 2, height / 2, width, height, 0x0e1524, 0.28));
   return layer;
+}
+
+/**
+ * A slow, looping pan + zoom ("Ken Burns") that makes a still background feel
+ * alive behind the story/dialogue and mini-game — subtle enough not to distract
+ * a 10-year-old. Skipped for motion-sensitive users. The tween is removed when
+ * the backdrop container is destroyed (the cleanup rule).
+ */
+function addKenBurns(
+  scene: Phaser.Scene,
+  img: Phaser.GameObjects.Image,
+  layer: Phaser.GameObjects.Container,
+  base: number,
+  width: number,
+  height: number
+): void {
+  const reduce =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
+  if (reduce) return;
+
+  const tween = scene.tweens.add({
+    targets: img,
+    scale: base * 1.05,
+    x: width / 2 + width * 0.015, // drift kept well inside the overscan margin
+    y: height / 2 - height * 0.015,
+    duration: 16000,
+    ease: "Sine.easeInOut",
+    yoyo: true,
+    repeat: -1,
+  });
+  layer.once(Phaser.GameObjects.Events.DESTROY, () => tween.remove());
 }
 
 /** Procedural stand-in scene, used until the arc's background art lands. */

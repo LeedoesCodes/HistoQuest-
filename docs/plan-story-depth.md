@@ -150,7 +150,13 @@ starting with 2 beats each and screenshotting the full run to judge length.
 animated background." The arc `bg.png` is currently a single static image. Make
 it feel alive — **subtly** (kids shouldn't be distracted or made queasy).
 
-### Phase 1 — code-only, no new art (do this first)
+### Phase 1 — code-only, no new art (do this first)  ✅ IMPLEMENTED 2026-07-31
+
+Ken Burns drift (pan + zoom, yoyo, reduced-motion guard, edge-safe overscan) added
+to the bg image in `createBackdrop` (`src/game/ui/backdrop.ts`); tween removed on
+container destroy. Applies to every arc screen and behind the mini-game. Overlay
+particles/clouds (below) not done — optional.
+
 
 Animate the existing single `bg` image inside `createBackdrop`
 (`src/game/ui/backdrop.ts`). Two cheap, reusable effects:
