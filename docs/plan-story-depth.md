@@ -196,6 +196,35 @@ for "slightly animated."
 
 ---
 
+## Feature C — per-beat scene slideshow  ✅ IMPLEMENTED 2026-07-31
+
+**Goal (Lee's words):** in the intro where characters are introduced, the
+background should change like a slideshow and *tell the story* every step —
+e.g. Magellan's journey across the world — instead of one fixed arc background.
+
+**Built:**
+- `src/game/ui/storyBackdrop.ts` — a `StoryBackdrop` the `GameScene` owns for the
+  arc. Sits at depth 1 (above the arc backdrop at 0, below presenters at 10/18).
+  `show(key)` cross-dissolves (600ms) to a beat's scene + a matching readability
+  scrim, with the same Ken Burns drift as the arc backdrop; `undefined`/unshipped
+  key fades back to the arc backdrop. Reduced-motion → instant swap, no drift.
+- `GameScene.playNodes` calls `storyBackdrop.show(...)` before each node: `story`
+  beats use `node.image`, `character` cards use the new `node.background`,
+  everything else clears to the arc backdrop. Torn down with the arc.
+- `story.ts` no longer draws `node.image` itself (StoryBackdrop owns backgrounds
+  now — avoids a double-draw).
+- `CharacterNode.background?` added to `content/types.ts`.
+- `mactan.ts` storyboarded: 8 scene keys across the intro (reef, datu_watch,
+  village, galleon_deck, spain_harbor, ocean_storm, open_ocean, cebu). The
+  Magellan backstory now reads departure → storms → open ocean.
+
+**Art:** the 8 `mactan/scene_*.png` backgrounds are speced in
+`docs/asset-brief.md §5b` but **not yet produced** — the game falls back to
+`mactan/bg.png` for every beat until they land (verified). Producing them is the
+remaining step; nothing else is needed to make the slideshow appear.
+
+**Verify:** `node scripts/shoot_intro.mjs <outDir>` walks the intro beat-by-beat.
+
 ## Suggested execution order
 
 1. **Feature A backstories** (content only, low risk, high value). Magellan is

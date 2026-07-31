@@ -163,6 +163,32 @@ as the character reference for the other two and change only the clothing prompt
 | `char_amihan.png` | CHAR | 400×500 | The ally's younger sibling, ~7, same world/clothing family as the ally. |
 | `boat_invader.png` | SPRITE | 200×140 | A small foreign landing boat with 1–2 armoured soldiers, side view, facing **left** (they move toward the shore on the left). |
 
+#### Mactan story-slideshow scenes (BG · 1600×1200 · same specs as `bg.png`)
+
+The intro plays as a **slideshow**: each beat cross-dissolves to its own scene so
+the background *illustrates the dialogue* (Magellan's voyage, the reef, Cebu),
+instead of one fixed backdrop. These are **opaque full-screen backgrounds** with
+the important subject in the **top two-thirds** (bottom is under the text panel),
+gently darkened toward the bottom. **Additive** — until a file lands, that beat
+falls back to `mactan/bg.png`, so nothing looks broken. Wired in `mactan.ts`.
+
+| File | Beats it backs | Scene |
+|---|---|---|
+| `scene_reef.png` | the ally intro | A child fishing the calm shallow reef at Mactan; coral, clear turquoise water, no adult figures. |
+| `scene_datu_watch.png` | Lapu-Lapu intro + backstory | Mactan shore from behind/beside a lone Visayan datu figure looking out to sea; quiet, resolute. |
+| `scene_village.png` | Lapu-Lapu's guardianship; his stand before the people | A small pre-colonial Visayan coastal village — nipa houses, boats, people going about life. |
+| `scene_galleon_deck.png` | Magellan intro; the demand | The deck/rigging of a 16th-c. European galleon looking out over open sea; ropes, sails, a horizon. |
+| `scene_spain_harbor.png` | "sailed for the King of Spain" | Tall galleons departing a 1500s Iberian harbour, stone quay, waving crowd small in the distance. |
+| `scene_ocean_storm.png` | months at sea; hunger & storms | Five small ships crossing a vast, grey, storm-tossed ocean — dwarfed by the sea. Tense, not gory. |
+| `scene_open_ocean.png` | "first to sail this far west" | A lone ship on an endless calm ocean at dusk, huge empty sky — solitude and scale. |
+| `scene_cebu.png` | Rajah Humabon's choice | A prosperous Cebu shoreline settlement — trade, calm water; a *different, peaceful* place from Mactan. |
+
+**Continuity:** these must match `bg.png`'s time-of-day family and the locked
+style (§3–4). Generate `bg.png` (or `scene_open_ocean`) as the style key first,
+then feed it back as the reference for the rest so the slideshow reads as one
+illustrator. No people-accuracy pitfalls except where figures appear — then §8
+applies (Visayan dress for Mactan folk, 16th-c. Iberian for Magellan's crew).
+
 ### 5c. Pugad Lawin — 1896 (`assets/pugad_lawin/`)
 
 | File | Type | Size | Notes |

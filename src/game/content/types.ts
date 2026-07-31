@@ -95,6 +95,14 @@ export interface CharacterNode {
   /** Background / goal beats, revealed one after another. */
   lines: LocalizedText[];
   image?: string;
+  /**
+   * Optional full-screen SCENE behind this card (distinct from `image`, which is
+   * the portrait). Lets a character intro set its own backdrop — the shore, a
+   * galleon's deck — so the intro sequence plays as a slideshow rather than one
+   * fixed arc background. Falls back to the arc backdrop when the art hasn't
+   * shipped. Same convention as `StoryNode.image` (e.g. "mactan/scene_reef").
+   */
+  background?: string;
 }
 
 /** Closing card separating what is documented from what was dramatised. */

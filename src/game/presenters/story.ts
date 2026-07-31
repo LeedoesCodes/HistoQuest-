@@ -41,15 +41,9 @@ export function playStory(scene: Phaser.Scene, node: StoryNode): Promise<void> {
     const layer = scene.add.container(0, 0).setDepth(10);
     const full = L(node.text);
 
-    // Optional per-beat illustration, sitting above the arc backdrop but below
-    // the text panel. Absent for most beats — the arc backdrop shows through.
-    if (hasImage(node.image) && scene.textures.exists(node.image)) {
-      const art = scene.add.image(width / 2, height / 2, node.image).setDepth(1);
-      art.setScale(Math.max(width / art.width, height / art.height));
-      art.setAlpha(0);
-      scene.tweens.add({ targets: art, alpha: 1, duration: 320 });
-      layer.add(art);
-    }
+    // The per-beat scene (`node.image`) is drawn by the StoryBackdrop slideshow
+    // layer that GameScene owns, so it can cross-dissolve between beats and Ken
+    // Burns-drift — not here. This presenter draws only the text + speaker.
 
     const style: Phaser.Types.GameObjects.Text.TextStyle = {
       fontFamily: FONT,

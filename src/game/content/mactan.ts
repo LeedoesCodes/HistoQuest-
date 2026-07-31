@@ -165,6 +165,7 @@ export const mactanArc: ArcContent = {
       role: { fil: "Batang mandaragat ng Mactan", en: "A young seafarer of Mactan" },
       historicity: "fictional",
       image: "mactan/char_ally",
+      background: "mactan/scene_reef",
       lines: [
         {
           fil: "Araw-araw kang nangingisda sa mababaw na tubig.",
@@ -189,6 +190,7 @@ export const mactanArc: ArcContent = {
       role: { fil: "Datu ng Mactan", en: "Datu of Mactan" },
       historicity: "real",
       image: "mactan/char_lapulapu",
+      background: "mactan/scene_datu_watch",
       lines: [
         {
           fil: "Hindi siya sumisigaw. Nakatingin lang siya sa dagat, matagal.",
@@ -209,6 +211,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_bs_lapulapu_1",
       type: "story",
+      image: "mactan/scene_village",
       speaker: { name: { fil: "Lapu-Lapu", en: "Lapu-Lapu" }, image: "mactan/char_lapulapu", side: "left" },
       text: {
         fil:
@@ -224,6 +227,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_bs_lapulapu_2",
       type: "story",
+      image: "mactan/scene_datu_watch",
       speaker: { name: { fil: "Lapu-Lapu", en: "Lapu-Lapu" }, image: "mactan/char_lapulapu", side: "left" },
       text: {
         fil:
@@ -241,6 +245,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s2a",
       type: "story",
+      image: "mactan/scene_ocean_storm",
       text: {
         fil:
           "Malayo ang pinanggalingan nila — mga buwan ang layo.\n" +
@@ -255,6 +260,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s2b",
       type: "story",
+      image: "mactan/scene_ocean_storm",
       text: {
         fil:
           "Ngunit hindi lang pampalasa ang hinahanap nila.\n" +
@@ -275,6 +281,7 @@ export const mactanArc: ArcContent = {
       role: { fil: "Kapitan ng mga dayuhang barko", en: "Captain of the foreign ships" },
       historicity: "real",
       image: "mactan/char_magellan",
+      background: "mactan/scene_galleon_deck",
       lines: [
         {
           fil: "Matapang siya at hindi sumusuko. Naglakbay siya nang mas malayo kaysa halos sinuman noon.",
@@ -295,6 +302,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_bs_magellan_1",
       type: "story",
+      image: "mactan/scene_spain_harbor",
       speaker: { name: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" }, image: "mactan/char_magellan", side: "right" },
       text: {
         fil:
@@ -310,6 +318,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_bs_magellan_2",
       type: "story",
+      image: "mactan/scene_ocean_storm",
       speaker: { name: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" }, image: "mactan/char_magellan", side: "right" },
       text: {
         fil:
@@ -325,6 +334,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_bs_magellan_3",
       type: "story",
+      image: "mactan/scene_open_ocean",
       speaker: { name: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" }, image: "mactan/char_magellan", side: "right" },
       text: {
         fil:
@@ -342,6 +352,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s3a",
       type: "story",
+      image: "mactan/scene_cebu",
       speaker: { name: { fil: "Rajah Humabon", en: "Rajah Humabon" }, image: "mactan/char_humabon", side: "right" },
       text: {
         fil:
@@ -355,6 +366,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s3b",
       type: "story",
+      image: "mactan/scene_cebu",
       text: {
         fil:
           "Para sa kaniya, kaligtasan at kalakalan ang tama.\n" +
@@ -371,6 +383,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s4a",
       type: "story",
+      image: "mactan/scene_galleon_deck",
       speaker: { name: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" }, image: "mactan/char_magellan", side: "right" },
       text: {
         fil:
@@ -386,6 +399,7 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_s4b",
       type: "story",
+      image: "mactan/scene_village",
       speaker: { name: { fil: "Lapu-Lapu", en: "Lapu-Lapu" }, image: "mactan/char_lapulapu", side: "left" },
       text: {
         fil:

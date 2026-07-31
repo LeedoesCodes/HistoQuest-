@@ -21,6 +21,7 @@ import { L, t } from "../i18n";
 import { IMAGE_URLS } from "../assets/images";
 import { loadSpriteSheets } from "../assets/sprites";
 import { createBackdrop } from "../ui/backdrop";
+import { StoryBackdrop } from "../ui/storyBackdrop";
 
 /**
  * GameScene — the ONLY scene. Everything (arc select, story, decisions,
@@ -73,6 +74,9 @@ export class GameScene extends Phaser.Scene {
 
     // Scene backdrop for the whole arc (real art if shipped, generated if not).
     const backdrop = createBackdrop(this, arcId);
+    // Per-beat slideshow layer that cross-dissolves scenes over that backdrop as
+    // the story is told; falls back to the arc backdrop when a beat names none.
+    const storyBackdrop = new StoryBackdrop(this);
 
     const chrome = this.add.container(0, 0).setDepth(5);
     chrome.add(
@@ -102,7 +106,7 @@ export class GameScene extends Phaser.Scene {
       items: forms.pre.map((q) => q.id).join(","),
     });
 
-    await this.playNodes(content, logger);
+    await this.playNodes(content, logger, storyBackdrop);
 
     // Post-assessment: DIFFERENT items covering the SAME objectives, so the
     // gain reflects learning rather than memorising the pre-test wording.
@@ -142,11 +146,20 @@ export class GameScene extends Phaser.Scene {
 
     await this.showSummary(pre.score, post.score, engagement.label, engagement.confidence, earnedStars, maxStars);
     chrome.destroy(true);
+    storyBackdrop.destroy();
     backdrop.destroy(true);
   }
 
-  private async playNodes(content: ArcContent, logger: BehaviorLogger) {
+  private async playNodes(content: ArcContent, logger: BehaviorLogger, storyBackdrop: StoryBackdrop) {
     for (const node of content.nodes) {
+      // Drive the slideshow: story beats carry their scene in `image`, character
+      // cards in `background`; everything else clears back to the arc backdrop.
+      // Called before the presenter runs so the scene is already dissolving in
+      // as the beat opens.
+      storyBackdrop.show(
+        node.type === "story" ? node.image : node.type === "character" ? node.background : undefined
+      );
+
       // Cinematic/narrative cards. Logged as story beats so the classifier's
       // features (decisions + mini-games) stay unchanged; the nodeId says which.
       if (node.type === "titlecard") {
