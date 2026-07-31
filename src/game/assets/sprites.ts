@@ -51,12 +51,16 @@ const ALL_SHEETS = [...MACTAN_HERO_SHEETS, ...MACTAN_ENEMY_SHEETS];
 
 /**
  * Draw metrics from the packed-frame bbox measurements. Origin puts the feet on
- * the container origin so `y = groundY` lands them on the shore; native/near-
- * native scale keeps pixels crisp. Hero: feet ~92/124. Enemy: feet ~110/148,
- * scaled to ~0.8 so it reads a touch shorter than the hero.
+ * the container origin so `y = groundY` lands them on the shore.
+ *
+ * The hero is a ~10-year-old; the enemies are armoured adult soldiers. So the
+ * kid is drawn deliberately SHORTER than the soldiers: hero ~0.72 (body ≈ 66px)
+ * vs enemy ~0.9 (body ≈ 99px) — roughly a 2:3 kid-to-adult ratio that reads
+ * clearly on the shore. (Was 1.0 / 0.8, which made the kid the taller of the
+ * two.) mactanDefense's hitbox/shot geometry is derived from the ~66px hero.
  */
-export const MACTAN_HERO = { originX: 0.5, originY: 92 / 124, scale: 1.0 };
-export const MACTAN_ENEMY = { originX: 0.5, originY: 110 / 148, scale: 0.8 };
+export const MACTAN_HERO = { originX: 0.5, originY: 92 / 124, scale: 0.72 };
+export const MACTAN_ENEMY = { originX: 0.5, originY: 110 / 148, scale: 0.9 };
 
 /** Load every shipped sheet as a spritesheet. Call from a scene `preload()`. */
 export function loadSpriteSheets(loader: Phaser.Loader.LoaderPlugin): void {
