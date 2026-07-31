@@ -1,6 +1,8 @@
 # Plan — Mactan mini-game controls / input refactor
 
-**Status:** PLAN only. Nothing built yet. Scope is `mactanDefense.ts` input.
+**Status:** IMPLEMENTED (2026-07-31) in `mactanDefense.ts` — verified desktop
+(buttons hidden, Ctrl-crouch / Space-jump / left-click attack) and touch (buttons
+reveal on first touch). Kept below for reference / the optional desktop hint.
 **Goal (Lee's words):** hide the on-screen buttons on a computer and only pop
 them on phone/tablet; add Space→jump and Ctrl→crouch (keeping the current binds
 too); attack on left-click on desktop, but on touch the ATAKE button is required.

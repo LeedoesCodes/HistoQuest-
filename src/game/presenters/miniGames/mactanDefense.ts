@@ -99,13 +99,25 @@ export function playMactanDefense(
     const controls = scene.add.container(0, 0).setDepth(15);
     const overlay = scene.add.container(0, 0).setDepth(20);
 
-    // Scrim so the side-view reads clearly over the arc backdrop.
+    // Scrim so the side-view reads clearly over the arc backdrop (the real
+    // Mactan bg shows through beneath it).
     field.add(scene.add.rectangle(width / 2, height / 2, width, height, 0x0a1420, 0.5));
-    // Sea band + beach ground.
-    field.add(scene.add.rectangle(width / 2, groundY - 30, width, 60, 0x1b4a5a, 0.5));
-    const ground = scene.add.rectangle(width / 2, groundY + GROUND_H / 2, width, GROUND_H, 0x6b5334).setStrokeStyle(2, 0x4a3720);
-    field.add(ground);
-    field.add(scene.add.rectangle(width / 2, groundY, width, 4, 0x8a6d3b)); // shoreline lip
+    // Shallow sea band where the water meets the shore.
+    field.add(scene.add.rectangle(width / 2, groundY - 26, width, 52, 0x1b4a5a, 0.45));
+    // Textured beach ground — damp sand at the waterline, warm dry sand, a foam
+    // lip and scattered grains — reads far better than the old flat brown bar
+    // and matches the sunset-shore palette.
+    const beach = scene.add.graphics();
+    beach.fillStyle(0xc9ad82, 1); beach.fillRect(0, groundY, width, GROUND_H);            // dry sand
+    beach.fillStyle(0xb0925f, 1); beach.fillRect(0, groundY, width, 18);                  // damp sand
+    beach.fillStyle(0x7d6746, 1); beach.fillRect(0, groundY + GROUND_H - 10, width, 10);  // shaded base
+    beach.fillStyle(0xefe6cf, 1); beach.fillRect(0, groundY - 2, width, 3);               // foam lip
+    for (let i = 0; i < 70; i++) {
+      const sx = Math.random() * width, sy = groundY + 10 + Math.random() * (GROUND_H - 14);
+      beach.fillStyle(Math.random() < 0.5 ? 0x8f7550 : 0xe2d3ab, 0.55);
+      beach.fillRect(sx, sy, 2, 2);
+    }
+    field.add(beach);
 
     // ---------------- PLAYER ----------------
     const player = scene.add.container(150, groundY);
@@ -167,17 +179,26 @@ export function playMactanDefense(
     updateHud();
 
     // ---------------- INPUT ----------------
-    const keys = scene.input.keyboard?.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,SPACE,F") as Record<string, Phaser.Input.Keyboard.Key> | undefined;
+    // Keyboard: move A/D or ←/→, jump W/↑/Space, crouch S/↓/Ctrl, attack F or
+    // left-click. Touch: the on-screen buttons below.
+    const keys = scene.input.keyboard?.addKeys("W,A,S,D,UP,DOWN,LEFT,RIGHT,SPACE,F,CTRL") as Record<string, Phaser.Input.Keyboard.Key> | undefined;
+    // Capture these so Space/arrows don't scroll the page and Ctrl doesn't fire
+    // browser shortcuts while playing. Released again in finish().
+    scene.input.keyboard?.addCapture("SPACE,CTRL,UP,DOWN,LEFT,RIGHT");
     const held = { left: false, right: false, crouch: false };
     let jumpQueued = false;
     let attackQueued = false;
 
+    // On-screen buttons — touch only. Tracked so their input can be toggled with
+    // visibility (invisible objects still receive input in Phaser).
+    const touchButtons: Phaser.GameObjects.Arc[] = [];
     const mkButton = (x: number, y: number, r: number, label: string, color: number, onDown: () => void, onUp?: () => void) => {
       const btn = scene.add.circle(x, y, r, color, 0.32).setStrokeStyle(2, color, 0.8).setInteractive({ useHandCursor: true });
       const txt = scene.add.text(x, y, label, { fontFamily: FONT, fontSize: "13px", color: "#ffffff", fontStyle: "bold" }).setOrigin(0.5);
       btn.on("pointerdown", onDown);
       if (onUp) { btn.on("pointerup", onUp); btn.on("pointerout", onUp); }
       controls.add([btn, txt]);
+      touchButtons.push(btn);
     };
     // Movement pad (bottom-left), action buttons (bottom-right).
     mkButton(48, height - 52, 26, "◀", 0x3d5a99, () => (held.left = true), () => (held.left = false));
@@ -185,6 +206,37 @@ export function playMactanDefense(
     mkButton(width - 118, height - 52, 26, "⤒", 0x4caf50, () => (jumpQueued = true));
     mkButton(width - 60, height - 90, 24, "⤓", 0x4fc3f7, () => (held.crouch = true), () => (held.crouch = false));
     mkButton(width - 52, height - 44, 30, t("mg.mactan.attack"), 0xe4572e, () => (attackQueued = true));
+
+    // --- desktop vs touch (adaptive) ---
+    // Buttons start visible (mkButton). Hide them on a hover + fine-pointer
+    // device (a computer), and switch live: a real touch reveals them, a mouse
+    // or key hides them — so a 2-in-1 shows them only once actually touched.
+    let controlsShown = true;
+    const setControlsShown = (show: boolean) => {
+      if (show === controlsShown) return;
+      controlsShown = show;
+      controls.setVisible(show);
+      for (const b of touchButtons) {
+        if (show) b.setInteractive({ useHandCursor: true });
+        else b.disableInteractive();
+      }
+    };
+    const prefersDesktop =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(hover: hover) and (pointer: fine)").matches === true;
+    setControlsShown(!prefersDesktop);
+
+    // Left-click attacks on desktop; a touch tap uses the ATAKE button instead.
+    const onPointerDown = (pointer: Phaser.Input.Pointer) => {
+      if (pointer.wasTouch) { setControlsShown(true); return; }
+      setControlsShown(false);
+      if (pointer.leftButtonDown()) attackQueued = true;
+    };
+    const onPointerMove = (pointer: Phaser.Input.Pointer) => { if (!pointer.wasTouch) setControlsShown(false); };
+    const onAnyKey = () => setControlsShown(false);
+    scene.input.on("pointerdown", onPointerDown);
+    scene.input.on("pointermove", onPointerMove);
+    scene.input.keyboard?.on("keydown", onAnyKey);
 
     // DEV hook so tests can drive without real input.
     if (import.meta.env.DEV) {
@@ -292,12 +344,12 @@ export function playMactanDefense(
       if (keys) {
         if (keys.A.isDown || keys.LEFT.isDown) moveDir -= 1;
         if (keys.D.isDown || keys.RIGHT.isDown) moveDir += 1;
-        if (Phaser.Input.Keyboard.JustDown(keys.W) || Phaser.Input.Keyboard.JustDown(keys.UP)) jumpQueued = true;
-        if (Phaser.Input.Keyboard.JustDown(keys.SPACE) || Phaser.Input.Keyboard.JustDown(keys.F)) attackQueued = true;
+        if (Phaser.Input.Keyboard.JustDown(keys.W) || Phaser.Input.Keyboard.JustDown(keys.UP) || Phaser.Input.Keyboard.JustDown(keys.SPACE)) jumpQueued = true;
+        if (Phaser.Input.Keyboard.JustDown(keys.F)) attackQueued = true;
       }
       if (held.left) moveDir -= 1;
       if (held.right) moveDir += 1;
-      crouching = grounded && ((keys?.S.isDown || keys?.DOWN.isDown) || held.crouch) === true;
+      crouching = grounded && ((keys?.S.isDown || keys?.DOWN.isDown || keys?.CTRL.isDown) || held.crouch) === true;
 
       if (moveDir !== 0) facing = moveDir;
 
@@ -412,6 +464,12 @@ export function playMactanDefense(
       if (done) return;
       done = true;
       scene.events.off(Phaser.Scenes.Events.UPDATE, update);
+      // Remove input listeners BEFORE the results overlay so a click on it can't
+      // fire a phantom attack; release the key captures we took.
+      scene.input.off("pointerdown", onPointerDown);
+      scene.input.off("pointermove", onPointerMove);
+      scene.input.keyboard?.off("keydown", onAnyKey);
+      scene.input.keyboard?.removeCapture("SPACE,CTRL,UP,DOWN,LEFT,RIGHT");
       spawner?.remove();
       failsafe.remove();
       if (import.meta.env.DEV) delete (window as unknown as { __mg?: unknown }).__mg;
