@@ -19,6 +19,7 @@ import { makePanel, makeButton } from "../ui/panel";
 import { sfx } from "../ui/sfx";
 import { L, t } from "../i18n";
 import { IMAGE_URLS } from "../assets/images";
+import { loadSpriteSheets } from "../assets/sprites";
 import { createBackdrop } from "../ui/backdrop";
 
 /**
@@ -46,6 +47,8 @@ export class GameScene extends Phaser.Scene {
     for (const [key, url] of Object.entries(IMAGE_URLS)) {
       if (!this.textures.exists(key)) this.load.image(key, url);
     }
+    // Character animation spritesheets (additive; falls back to code-art).
+    loadSpriteSheets(this.load);
   }
 
   create() {

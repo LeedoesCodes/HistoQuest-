@@ -4,6 +4,20 @@ import { COLORS, FONT } from "../../ui/theme";
 import { burst, shake, flash, floatText, showStars, starsFor } from "../../ui/juice";
 import { sfx } from "../../ui/sfx";
 import { t } from "../../i18n";
+import { ensureMactanHeroAnims, ensureMactanEnemyAnims, animKeyFor, MACTAN_HERO, MACTAN_ENEMY } from "../../assets/sprites";
+
+/**
+ * The hero's spear as a small code-art sibling (PixelLab drops the baked spear
+ * across animations, so it's pinned separately and driven by us). Pivot at the
+ * grip; shaft grows upward so a +90° rotation thrusts it forward.
+ */
+function makeSpear(scene: Phaser.Scene): Phaser.GameObjects.Container {
+  const c = scene.add.container(0, 0);
+  const shaft = scene.add.rectangle(0, 0, 3, 42, 0x7a5230).setStrokeStyle(1, 0x4e3419).setOrigin(0.5, 1);
+  const tip = scene.add.rectangle(0, -42, 5, 9, 0xd8c69a).setStrokeStyle(1, 0x8a6d3b).setOrigin(0.5, 1);
+  c.add([shaft, tip]);
+  return c;
+}
 
 /**
  * Mactan defense — SIDE-VIEW action combat.
@@ -50,6 +64,7 @@ interface Enemy {
   telegraphKind: ShotKind;
   marker: Phaser.GameObjects.Text;
   dead: boolean;
+  sprite?: Phaser.GameObjects.Sprite;
 }
 interface Shot {
   c: Phaser.GameObjects.Container;
@@ -93,16 +108,39 @@ export function playMactanDefense(
     field.add(scene.add.rectangle(width / 2, groundY, width, 4, 0x8a6d3b)); // shoreline lip
 
     // ---------------- PLAYER ----------------
-    // Flat warrior built from shapes; swap this block for a sprite later.
     const player = scene.add.container(150, groundY);
-    const pLegL = scene.add.rectangle(-6, -8, 8, 18, 0x3a2a20).setOrigin(0.5, 0);
-    const pLegR = scene.add.rectangle(6, -8, 8, 18, 0x3a2a20).setOrigin(0.5, 0);
-    const pBody = scene.add.rectangle(0, -20, 22, 26, 0x8d3b2e).setStrokeStyle(2, 0x5b2016).setOrigin(0.5, 1);
-    const pShield = scene.add.circle(-13, -26, 10, 0xcbb98a).setStrokeStyle(2, 0x8a6d3b);
-    const pHead = scene.add.circle(0, -44, 9, 0xe8c9a0);
-    const pWeapon = scene.add.rectangle(11, -30, 5, 30, 0x9aa4b0).setOrigin(0.5, 1); // club/bolo
-    player.add([pLegL, pLegR, pWeapon, pBody, pShield, pHead]);
     field.add(player);
+
+    // Prefer the animated PixelLab sprite; fall back to flat code-art shapes if
+    // the sheets weren't shipped (the game must run with zero character art).
+    const useHeroSprite = ensureMactanHeroAnims(scene);
+    const useEnemySprite = ensureMactanEnemyAnims(scene);
+    let hero: Phaser.GameObjects.Sprite | undefined;
+    let heroState = "";
+    let spear: Phaser.GameObjects.Container | undefined;
+
+    // Shape-fallback parts — only built when there is no sprite.
+    let pLegL!: Phaser.GameObjects.Rectangle, pLegR!: Phaser.GameObjects.Rectangle;
+    let pBody!: Phaser.GameObjects.Rectangle, pWeapon!: Phaser.GameObjects.Rectangle;
+    let pShield!: Phaser.GameObjects.Arc, pHead!: Phaser.GameObjects.Arc;
+
+    if (useHeroSprite) {
+      hero = scene.add
+        .sprite(0, 0, "mactan/hero_idle")
+        .setOrigin(MACTAN_HERO.originX, MACTAN_HERO.originY)
+        .setScale(MACTAN_HERO.scale);
+      hero.play(animKeyFor("mactan/hero_idle"));
+      spear = makeSpear(scene);
+      player.add([spear, hero]);
+    } else {
+      pLegL = scene.add.rectangle(-6, -8, 8, 18, 0x3a2a20).setOrigin(0.5, 0);
+      pLegR = scene.add.rectangle(6, -8, 8, 18, 0x3a2a20).setOrigin(0.5, 0);
+      pBody = scene.add.rectangle(0, -20, 22, 26, 0x8d3b2e).setStrokeStyle(2, 0x5b2016).setOrigin(0.5, 1);
+      pShield = scene.add.circle(-13, -26, 10, 0xcbb98a).setStrokeStyle(2, 0x8a6d3b);
+      pHead = scene.add.circle(0, -44, 9, 0xe8c9a0);
+      pWeapon = scene.add.rectangle(11, -30, 5, 30, 0x9aa4b0).setOrigin(0.5, 1); // club/bolo
+      player.add([pLegL, pLegR, pWeapon, pBody, pShield, pHead]);
+    }
     // player physics state
     let px = 150, py = groundY, pvy = 0, grounded = true, facing = 1, crouching = false;
     let walkPhase = 0;
@@ -163,19 +201,29 @@ export function playMactanDefense(
       if (done) return;
       spawned++;
       const c = scene.add.container(width - 40 - Math.random() * 60, groundY);
-      const legL = scene.add.rectangle(-6, -8, 8, 18, 0x263238).setOrigin(0.5, 0);
-      const legR = scene.add.rectangle(6, -8, 8, 18, 0x263238).setOrigin(0.5, 0);
-      const body = scene.add.rectangle(0, -18, 22, 26, 0x455a74).setStrokeStyle(2, 0x2f3e52).setOrigin(0.5, 1);
-      const head = scene.add.circle(0, -40, 9, 0xd9b892);
-      const helmet = scene.add.rectangle(0, -46, 22, 8, 0x9aa4b0).setStrokeStyle(1, 0x5b6470);
-      const gun = scene.add.rectangle(-4, -22, 26, 4, 0x5a4326).setOrigin(1, 0.5);
       const marker = scene.add.text(0, -62, "", { fontFamily: FONT, fontSize: "18px", fontStyle: "bold", color: "#e4572e" }).setOrigin(0.5);
-      c.add([legL, legR, gun, body, head, helmet, marker]);
+      let sprite: Phaser.GameObjects.Sprite | undefined;
+      if (useEnemySprite) {
+        sprite = scene.add
+          .sprite(0, 0, "mactan/enemy_walk")
+          .setOrigin(MACTAN_ENEMY.originX, MACTAN_ENEMY.originY)
+          .setScale(MACTAN_ENEMY.scale);
+        sprite.play(animKeyFor("mactan/enemy_walk"));
+        c.add([sprite, marker]);
+      } else {
+        const legL = scene.add.rectangle(-6, -8, 8, 18, 0x263238).setOrigin(0.5, 0);
+        const legR = scene.add.rectangle(6, -8, 8, 18, 0x263238).setOrigin(0.5, 0);
+        const body = scene.add.rectangle(0, -18, 22, 26, 0x455a74).setStrokeStyle(2, 0x2f3e52).setOrigin(0.5, 1);
+        const head = scene.add.circle(0, -40, 9, 0xd9b892);
+        const helmet = scene.add.rectangle(0, -46, 22, 8, 0x9aa4b0).setStrokeStyle(1, 0x5b6470);
+        const gun = scene.add.rectangle(-4, -22, 26, 4, 0x5a4326).setOrigin(1, 0.5);
+        c.add([legL, legR, gun, body, head, helmet, marker]);
+      }
       field.add(c);
       const barBg = scene.add.rectangle(0, -70, 34, 5, 0x000000, 0.5).setOrigin(0.5);
       const barFill = scene.add.rectangle(-17, -70, 34, 5, 0x8bc34a).setOrigin(0, 0.5);
       c.add([barBg, barFill]);
-      enemies.push({ c, hp: ENEMY_HP, barBg, barFill, shootCd: Phaser.Math.Between(900, 1600), telegraph: 0, telegraphKind: "high", marker, dead: false });
+      enemies.push({ c, hp: ENEMY_HP, barBg, barFill, shootCd: Phaser.Math.Between(900, 1600), telegraph: 0, telegraphKind: "high", marker, dead: false, sprite });
     }
     // start with two, spawn the rest over time
     spawnEnemy(); spawnEnemy();
@@ -280,15 +328,35 @@ export function playMactanDefense(
 
       // --- draw player pose ---
       player.setPosition(px, py);
-      player.setScale(facing, 1);
-      const swing = attackActive > 0 ? -70 * facing : 0;
-      pWeapon.setAngle(swing);
-      if (crouching) { pBody.scaleY = 0.6; pHead.y = -32; pShield.y = -18; player.y = py; pLegL.scaleY = 0.5; pLegR.scaleY = 0.5; }
-      else { pBody.scaleY = 1; pHead.y = -44; pShield.y = -26; pLegL.scaleY = 1; pLegR.scaleY = 1; }
-      // little walk wobble
-      const wob = Math.sin(walkPhase) * 3;
-      pLegL.y = -8 + (grounded ? wob : -4);
-      pLegR.y = -8 - (grounded ? wob : -4);
+      player.setScale(facing, 1); // flips the whole rig (sprite + spear) to face left
+
+      if (hero) {
+        // Animation state machine — priority: airborne > crouch > walk > idle.
+        let want = "idle";
+        if (!grounded) want = "jump";
+        else if (crouching) want = "crouch";
+        else if (moveDir !== 0) want = "walk";
+        if (want !== heroState) {
+          heroState = want;
+          if (want === "crouch") { hero.anims.stop(); hero.setTexture("mactan/hero_crouch", 2); }
+          else hero.play(animKeyFor("mactan/hero_" + want), true);
+        }
+        if (spear) {
+          const thrust = attackActive > 0; // swing to a forward stab on attack
+          spear.setAngle(thrust ? 90 : -8);
+          spear.setPosition(thrust ? 14 : 8, thrust ? -30 : -34);
+          spear.setVisible(!crouching);
+        }
+      } else {
+        const swing = attackActive > 0 ? -70 * facing : 0;
+        pWeapon.setAngle(swing);
+        if (crouching) { pBody.scaleY = 0.6; pHead.y = -32; pShield.y = -18; player.y = py; pLegL.scaleY = 0.5; pLegR.scaleY = 0.5; }
+        else { pBody.scaleY = 1; pHead.y = -44; pShield.y = -26; pLegL.scaleY = 1; pLegR.scaleY = 1; }
+        // little walk wobble
+        const wob = Math.sin(walkPhase) * 3;
+        pLegL.y = -8 + (grounded ? wob : -4);
+        pLegR.y = -8 - (grounded ? wob : -4);
+      }
 
       // player hitbox (reflects crouch/jump so dodging works)
       const halfH = crouching ? 20 : 46;
@@ -298,10 +366,14 @@ export function playMactanDefense(
       // --- enemies ---
       for (const e of enemies) {
         if (e.dead) continue;
-        e.c.setScale(px < e.c.x ? 1 : -1, 1);
+        // The east-facing sprite art faces the opposite way from the old shapes.
+        const faceLeft = px < e.c.x;
+        e.c.setScale(e.sprite ? (faceLeft ? -1 : 1) : faceLeft ? 1 : -1, 1);
         const dist = e.c.x - px;
-        // approach until in shooting range
-        if (Math.abs(dist) > 210) e.c.x -= Math.sign(dist) * 46 * dt;
+        // approach until in shooting range — walk only while actually moving
+        const approaching = Math.abs(dist) > 210;
+        if (e.sprite) { if (approaching) e.sprite.anims.resume(); else e.sprite.anims.pause(); }
+        if (approaching) e.c.x -= Math.sign(dist) * 46 * dt;
         // contact damage
         if (Math.abs(dist) < 26 && Math.abs(e.c.y - py) < 60) hurtPlayer(CONTACT_DMG, e.c.x);
         // shoot cycle

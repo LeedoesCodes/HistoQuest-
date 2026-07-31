@@ -205,6 +205,38 @@ export const mactanArc: ArcContent = {
       ],
     },
 
+    // M3b — Lapu-Lapu's backstory (who he was + why he stood firm), his own voice
+    {
+      id: "mac_bs_lapulapu_1",
+      type: "story",
+      speaker: { name: { fil: "Lapu-Lapu", en: "Lapu-Lapu" }, image: "mactan/char_lapulapu", side: "left" },
+      text: {
+        fil:
+          "Matagal nang datu ng Mactan si Lapu-Lapu.\n" +
+          "Binantayan niya ang pulo, ang mga tao, at ang dagat nito\n" +
+          "bago pa dumating ang sinumang dayuhan.",
+        en:
+          "Lapu-Lapu had long been the datu of Mactan.\n" +
+          "He watched over the island, its people, and its sea\n" +
+          "long before any stranger arrived.",
+      },
+    },
+    {
+      id: "mac_bs_lapulapu_2",
+      type: "story",
+      speaker: { name: { fil: "Lapu-Lapu", en: "Lapu-Lapu" }, image: "mactan/char_lapulapu", side: "left" },
+      text: {
+        fil:
+          "Hindi siya naghahanap ng away.\n" +
+          "Ngunit ayaw niyang yumuko sa haring hindi niya kilala,\n" +
+          "ni magbayad ng buwis para sa lupang sa kanila na.",
+        en:
+          "He was not looking for a fight.\n" +
+          "But he would not bow to a king he had never met,\n" +
+          "nor pay tribute for land that was already their own.",
+      },
+    },
+
     // M4 — why they came
     {
       id: "mac_s2a",
@@ -257,6 +289,53 @@ export const mactanArc: ArcContent = {
           en: "But one thing he never studied: the water. He believes armour and guns are enough.",
         },
       ],
+    },
+
+    // M5b — Magellan's backstory (purpose + voyage), told in his own voice
+    {
+      id: "mac_bs_magellan_1",
+      type: "story",
+      speaker: { name: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" }, image: "mactan/char_magellan", side: "right" },
+      text: {
+        fil:
+          "Si Magellan ay naglayag para sa hari ng Espanya.\n" +
+          "Pangarap niya: makahanap ng bagong daan patungo sa mga pulo ng pampalasa,\n" +
+          "at angkinin ang mga lupaing kanyang madaraanan.",
+        en:
+          "Magellan sailed for the King of Spain.\n" +
+          "His dream: to find a new route to the spice islands,\n" +
+          "and to claim the lands he passed along the way.",
+      },
+    },
+    {
+      id: "mac_bs_magellan_2",
+      type: "story",
+      speaker: { name: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" }, image: "mactan/char_magellan", side: "right" },
+      text: {
+        fil:
+          "Noong 1519, umalis siya sa Espanya dala ang limang barko.\n" +
+          "Mahigit isang taon silang naglakbay sa dagat —\n" +
+          "gutom, bagyo, at karagatang tila walang katapusan.",
+        en:
+          "In 1519 he left Spain with five ships.\n" +
+          "They journeyed the seas for more than a year —\n" +
+          "hunger, storms, and an ocean that seemed to have no end.",
+      },
+    },
+    {
+      id: "mac_bs_magellan_3",
+      type: "story",
+      speaker: { name: { fil: "Ferdinand Magellan", en: "Ferdinand Magellan" }, image: "mactan/char_magellan", side: "right" },
+      text: {
+        fil:
+          "Siya ang unang naglayag nang ganito kalayo pakanluran.\n" +
+          "Ngunit sa Mactan, may hindi niya inakala:\n" +
+          "na isang maliit na pulo ang tatayo laban sa kanya.",
+        en:
+          "He was the first to sail this far to the west.\n" +
+          "But at Mactan, one thing he did not expect:\n" +
+          "that a small island would stand against him.",
+      },
     },
 
     // M6 — Humabon's choice
@@ -513,6 +592,10 @@ export const mactanArc: ArcContent = {
         {
           fil: "Totoong pinuno ng Cebu si Rajah Humabon, at nakipagkasundo siya sa mga dayuhan.",
           en: "Rajah Humabon was a real leader of Cebu, and he did make peace with the strangers.",
+        },
+        {
+          fil: "Hindi natapos ni Magellan ang paglalakbay palibot sa mundo — nasawi siya sa Mactan. Si Juan Sebastián Elcano ang nagdala ng huling barko pabalik sa Espanya noong 1522.",
+          en: "Magellan did not finish the voyage around the world — he died at Mactan. Juan Sebastián Elcano brought the last ship home to Spain in 1522.",
         },
       ],
       invented: [
