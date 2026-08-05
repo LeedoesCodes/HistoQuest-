@@ -1,6 +1,6 @@
 # Architecture
 
-Last repository review: 2026-08-03
+Last repository review: 2026-08-05
 
 ## Overview
 
@@ -50,7 +50,13 @@ The Mactan, Pugad Lawin, and Datu Bago arc definitions live in `src/game/content
 
 `MiniGameNode.key` is resolved by `getMiniGame()` in `src/game/presenters/miniGames/index.ts`. Registered presenters resolve a standard `MiniGameResult` (`score`, `attempts`, `msSpent`); unregistered keys use `playMiniGamePlaceholder` so incomplete arcs remain playable.
 
-`mactanDefense.ts` is the current largest gameplay presenter. It owns its world, camera, HUD, entities, local relay signals, defense-stage state, spawning, and result overlay. It is not a separate Phaser scene. Mactan’s gameplay is feature-frozen: only explicit approved revisions or regression fixes may change it.
+`mactanDefense.ts` is the current largest gameplay presenter. It owns its world, camera, HUD, entities, local relay signals, defense-stage state, spawning, and result overlay. It is not a separate Phaser scene.
+
+**Mactan gameplay is being redesigned.** The relay gameplay freeze was lifted on 2026-08-05; the authoritative design is now [`MACTAN_FORMATION_COMBAT_SPEC.md`](MACTAN_FORMATION_COMBAT_SPEC.md). Implementation has not started.
+
+The migration adds Formation Combat as a **second registered presenter** rather than editing `mactanDefense.ts` in place. Because `getMiniGame()` resolves by node key, both can coexist: the relay presenter stays the routed implementation and the verified fallback (tag `mactan-relay-fallback`) until the new vertical slice is accepted, at which point the arc is routed over and the relay presenter is retired. Until then, change `mactanDefense.ts` only for a regression in the fallback itself.
+
+This is a presenter-level change only. The single-`GameScene` orchestration, the registry contract, `MiniGameResult`, the container/listener cleanup rule, additive-asset fallback, and the behavioral-logging path are all unchanged.
 
 ## Localization
 

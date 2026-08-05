@@ -1,17 +1,40 @@
 # Project Status
 
-Last repository review: 2026-08-03
+Last repository review: 2026-08-05
 
 ## Current development phase
 
-**Mactan gameplay feature freeze.** The current focus is visual-production planning and asset consistency. No new Mactan gameplay mechanics are authorized by this status document.
+**Mactan Formation Combat redesign — approved, not started.**
+
+The previous Mactan gameplay feature freeze is **superseded**. It was lifted on
+2026-08-05 by an explicit approved design revision. The approved replacement
+direction is [`MACTAN_FORMATION_COMBAT_SPEC.md`](MACTAN_FORMATION_COMBAT_SPEC.md),
+which is the authoritative gameplay design for the Mactan battle mini-game.
+
+**Implementation has not started.** No gameplay code has changed. Phase 1 of the
+spec's migration plan (§18) is the next milestone.
+
+## Fallback baseline
+
+The relay-defense mini-game remains the **live, routed implementation** and the
+verified rollback target until the Formation Combat vertical slice is accepted.
+
+| Reference | Value |
+|---|---|
+| Commit | `80208ef27e73f4f770efc511ba7fb2232a5e43a2` |
+| Branch | `mactan-relay-fallback-baseline` (pushed to `origin`) |
+| Tag | `mactan-relay-fallback` (annotated, pushed to `origin`) |
+
+Verified in an isolated clean checkout on 2026-08-05: `npm run typecheck`,
+`npm run test:mactan`, `npm run build`, and `git diff --check` all pass without
+any excluded asset or documentation change.
 
 ## Completed systems
 
 - React, TypeScript, Vite, and Phaser game shell.
 - Bilingual Filipino/English story-content model, dialogue, decisions, assessments, and mini-game presenter registry.
 - Mactan chapter story flow, including the three reviewed decision points.
-- Mactan Defense mini-game: child support role, Hold, Tactical Fall Back, Advance, defense stages, Defense Line HUD, visible regrouping, and success/recovery results.
+- Mactan Defense mini-game (relay design — now the **fallback**, superseded as future direction): child support role, Hold, Tactical Fall Back, Advance, defense stages, Defense Line HUD, visible regrouping, and success/recovery results.
 - Scrollable 2400 x 600 Mactan world with fixed HUD and controls.
 - Mactan regression automation: `npm.cmd run test:mactan`, including state checks and screenshots.
 - Pugad Lawin story content and three registered mini-games.
@@ -19,6 +42,7 @@ Last repository review: 2026-08-03
 
 ## Systems in progress
 
+- Mactan Formation Combat: specification recorded and approved; implementation not begun.
 - Visual asset production for a consistent Mactan presentation. The approved source of truth is [`ART_PRODUCTION_GUIDE.md`](../ART_PRODUCTION_GUIDE.md).
 - Asset inventory and production planning, recorded in [`ASSET_TRACKER.md`](ASSET_TRACKER.md).
 
@@ -63,4 +87,12 @@ BG-001 through BG-008 are approved and integrated. BG-002 through BG-008 were ge
 
 ## Next recommended task
 
-Review the now-integrated Mactan story backgrounds on target devices only if a specific visual regression is reported. Do not change gameplay as part of that work.
+**Phase 1 of the Formation Combat migration plan** (spec §18): register a new
+presenter with the reoriented 2400 × 600 world, depth bands, camera model, and a
+movable player — no combat. The relay presenter stays registered and routed, so
+the game remains playable throughout.
+
+Before Phase 1 begins, the open items in spec §20.2 that Phase 1 depends on need
+resolution — the depth-band `y` ranges, the camera values, and the new presenter
+key and filename. The spec deliberately leaves them open rather than inventing
+them.
