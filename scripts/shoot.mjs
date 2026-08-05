@@ -1,3 +1,6 @@
+// LEGACY: this driver assumes the former direct-player-combat controls (Space
+// attack). Keep it for historical reference; use verify_mactan.mjs for current
+// Mactan verification.
 // Playwright screenshot driver — gives the agent "eyes" on the real game.
 //
 // Unlike frame-pumping, this runs a REAL browser with a REAL animation loop,

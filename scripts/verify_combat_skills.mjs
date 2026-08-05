@@ -1,3 +1,5 @@
+// LEGACY: this script verifies removed player attack/heavy-attack mechanics.
+// Use verify_mactan.mjs for the current support-role Mactan mini-game.
 // Verifies Feature E (skills) via the DEV __mg hook + a charge-ring screenshot:
 //   1. DASH grants guaranteed i-frames (a hit during the dash window does 0 dmg),
 //   2. DASH has a cooldown (dashCd > 0 right after dashing),

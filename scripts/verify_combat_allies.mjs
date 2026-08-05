@@ -1,3 +1,5 @@
+// LEGACY: this script verifies the removed direct-player-combat design. Use
+// verify_mactan.mjs for the current support-role Mactan mini-game.
 // Verifies Feature D (combat rebalance) via the DEV __mg hook + a screenshot:
 //   1. outnumbering — you + NUM_ALLIES allies vs a few enemies (screenshot),
 //   2. allies SOFTEN but can't FINISH — idle (no player attacks); assert no

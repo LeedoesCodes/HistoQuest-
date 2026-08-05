@@ -40,6 +40,7 @@ export const MACTAN_HERO_SHEETS: SpriteSheetDef[] = [
   { key: "mactan/hero_idle", frame: 124, frames: 8, frameRate: 8, repeat: -1 },
   { key: "mactan/hero_jump", frame: 124, frames: 9, frameRate: 14, repeat: 0 },
   { key: "mactan/hero_crouch", frame: 124, frames: 5, frameRate: 12, repeat: 0 },
+  { key: "mactan/hero_attack", frame: 124, frames: 3, frameRate: 16, repeat: 0 },
 ];
 
 /** The guardia civil enemy. Only a walk (idle/aim reuses a paused frame). */
@@ -47,20 +48,30 @@ export const MACTAN_ENEMY_SHEETS: SpriteSheetDef[] = [
   { key: "mactan/enemy_walk", frame: 148, frames: 6, frameRate: 10, repeat: -1 },
 ];
 
-const ALL_SHEETS = [...MACTAN_HERO_SHEETS, ...MACTAN_ENEMY_SHEETS];
+/** Allied Mactan warrior (fights beside the player). 180px canvas from PixelLab. */
+export const MACTAN_ALLY_SHEETS: SpriteSheetDef[] = [
+  { key: "mactan/ally_walk", frame: 180, frames: 6, frameRate: 10, repeat: -1 },
+  { key: "mactan/ally_attack", frame: 180, frames: 3, frameRate: 14, repeat: 0 },
+  { key: "mactan/ally_idle", frame: 180, frames: 1, frameRate: 1, repeat: -1 },
+];
+
+const ALL_SHEETS = [...MACTAN_HERO_SHEETS, ...MACTAN_ENEMY_SHEETS, ...MACTAN_ALLY_SHEETS];
 
 /**
  * Draw metrics from the packed-frame bbox measurements. Origin puts the feet on
  * the container origin so `y = groundY` lands them on the shore.
  *
- * The hero is a ~10-year-old; the enemies are armoured adult soldiers. So the
- * kid is drawn deliberately SHORTER than the soldiers: hero ~0.72 (body ≈ 66px)
- * vs enemy ~0.9 (body ≈ 99px) — roughly a 2:3 kid-to-adult ratio that reads
- * clearly on the shore. (Was 1.0 / 0.8, which made the kid the taller of the
- * two.) mactanDefense's hitbox/shot geometry is derived from the ~66px hero.
+ * Sizes are matched to the ALLY warrior as the reference adult (~104px on
+ * screen). The Spanish soldiers are adults too, so they scale to ~101px; the
+ * hero is a ~10-year-old, kept clearly shorter at ~78px (≈0.75× the adults).
+ * Measured figure heights in-canvas: hero 60, enemy 72, ally 144 — hence the
+ * different scale numbers. mactanDefense's hitbox/shot geometry is derived from
+ * the ~78px hero.
  */
-export const MACTAN_HERO = { originX: 0.5, originY: 92 / 124, scale: 0.72 };
-export const MACTAN_ENEMY = { originX: 0.5, originY: 110 / 148, scale: 0.9 };
+export const MACTAN_HERO = { originX: 0.5, originY: 92 / 124, scale: 1.3 };
+export const MACTAN_ENEMY = { originX: 0.5, originY: 110 / 148, scale: 1.4 };
+// Ally: feet at 162/180 (measured). The reference adult on screen (~104px).
+export const MACTAN_ALLY = { originX: 0.5, originY: 162 / 180, scale: 0.72 };
 
 /** Load every shipped sheet as a spritesheet. Call from a scene `preload()`. */
 export function loadSpriteSheets(loader: Phaser.Loader.LoaderPlugin): void {
@@ -100,6 +111,10 @@ export function ensureMactanHeroAnims(scene: Phaser.Scene): boolean {
 
 export function ensureMactanEnemyAnims(scene: Phaser.Scene): boolean {
   return ensureAnims(scene, MACTAN_ENEMY_SHEETS);
+}
+
+export function ensureMactanAllyAnims(scene: Phaser.Scene): boolean {
+  return ensureAnims(scene, MACTAN_ALLY_SHEETS);
 }
 
 /** "mactan/hero_walk" -> "anim_mactan/hero_walk" (stable, collision-free). */

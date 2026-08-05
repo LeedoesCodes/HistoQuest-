@@ -182,6 +182,69 @@ export const mactanArc: ArcContent = {
       ],
     },
 
+    // M2b — the approaching ships create an urgent choice
+    {
+      id: "mac_s1b",
+      type: "story",
+      image: "mactan/scene_reef",
+      text: {
+        fil:
+          "Patuloy na lumalapit ang mga barko.\n" +
+          "Hindi mo alam kung sino sila o bakit sila narito.\n" +
+          "Sa dalampasigan, nagtitipon ang mga taong nag-aalala.\n" +
+          "Kailangan mong kumilos.",
+        en:
+          "The ships keep coming closer.\n" +
+          "You do not know who they are or why they are here.\n" +
+          "Worried people gather by the shore.\n" +
+          "You need to act.",
+      },
+    },
+
+    // M2c — first response to the approaching ships (all paths converge)
+    {
+      id: "mac_decision_sails",
+      type: "decision",
+      prompt: { fil: "Ano ang una mong gagawin?", en: "What will you do first?" },
+      timeLimitMs: 10000,
+      defaultChoiceId: "tell_lapulapu",
+      choices: [
+        {
+          id: "tell_lapulapu",
+          label: {
+            fil: "Sabihin kay Lapu-Lapu ang tungkol sa mga layag",
+            en: "Tell Lapu-Lapu about the sails",
+          },
+          response: {
+            fil: "Mabuti. Kailangan niyang malaman ang nakita mo.",
+            en: "Good. He needs to know what you saw.",
+          },
+        },
+        {
+          id: "move_children",
+          label: {
+            fil: "Ilayo ang mga bata sa dalampasigan",
+            en: "Lead the children away from the shore",
+          },
+          response: {
+            fil: "Tama. Hindi pa malinaw ang mangyayari, ngunit mahalaga ang kanilang kaligtasan.",
+            en: "Right. We do not yet know what will happen, but their safety matters.",
+          },
+        },
+        {
+          id: "study_reef",
+          label: {
+            fil: "Pagmasdan ang bahura at ang daan ng mga barko",
+            en: "Watch the reef and the ships' path",
+          },
+          response: {
+            fil: "Tiningnan mong mabuti ang tubig. Mababaw dito — at matalim ang bahura.",
+            en: "You study the water closely. It is shallow here — and the coral is sharp.",
+          },
+        },
+      ],
+    },
+
     // M3 — Lapu-Lapu
     {
       id: "mac_char_lapulapu",
@@ -441,6 +504,53 @@ export const mactanArc: ArcContent = {
           "“Our water is shallow.”",
       },
     },
+    // M8b — community preparation using local knowledge (all paths converge)
+    {
+      id: "mac_decision_prepare",
+      type: "decision",
+      prompt: {
+        fil: "Paano makatutulong ang kaalaman mo sa tubig?",
+        en: "How can your knowledge of the water help?",
+      },
+      timeLimitMs: 10000,
+      defaultChoiceId: "share_shallows",
+      choices: [
+        {
+          id: "share_shallows",
+          label: {
+            fil: "Ipakita kung saan mababaw ang tubig",
+            en: "Show where the water is shallow",
+          },
+          response: {
+            fil: "Itinuro mo ang mababaw na daan. Pag-uusapan ito nina Lapu-Lapu at ng mga mandirigma.",
+            en: "You point out the shallow route. Lapu-Lapu and the warriors will plan around it.",
+          },
+        },
+        {
+          id: "mark_coral",
+          label: {
+            fil: "Ipakita kung saan matalim ang bahura",
+            en: "Show where the coral is sharp",
+          },
+          response: {
+            fil: "Ipinakita mo ang matatalim na bahagi ng bahura. Mahalagang alam ito ng mga nakatatanda.",
+            en: "You point out the sharp coral. The elders need to know where it lies.",
+          },
+        },
+        {
+          id: "guide_people",
+          label: {
+            fil: "Ipakita kung saan ligtas dumaan ang mga tao",
+            en: "Show where people can move safely",
+          },
+          response: {
+            fil: "Itinuro mo ang daang malayo sa matalim na bahura. Makapaghahanda ang mga tao nang mas ligtas.",
+            en: "You point out a path away from the sharp coral. People can prepare more safely.",
+          },
+        },
+      ],
+    },
+
     {
       id: "mac_s5b",
       type: "story",
@@ -449,11 +559,11 @@ export const mactanArc: ArcContent = {
         fil:
           "“Hindi sila makakalapit. Kailangan nilang maglakad sa dagat.”\n" +
           "Napatingin siya sa iyo.\n" +
-          "“Batang mandaragat — kabisado mo ang bahura, hindi ba?”",
+          "“Batang mandaragat — samahan mo kami sa bahura.”",
         en:
           "“They cannot come close. They will have to walk through the sea.”\n" +
           "He looked at you.\n" +
-          "“Young seafarer — you know the reef, don't you?”",
+          "“Young seafarer — come with us to the reef.”",
       },
     },
     {
@@ -473,32 +583,35 @@ export const mactanArc: ArcContent = {
     {
       id: "mac_decision",
       type: "decision",
-      prompt: { fil: "Paano mo tutulungan si Lapu-Lapu?", en: "How will you help Lapu-Lapu?" },
-      timeLimitMs: 8000,
-      defaultChoiceId: "reef",
+      prompt: { fil: "Paano ka tutulong sa mga nakatatanda?", en: "How will you help the elders?" },
+      timeLimitMs: 10000,
+      defaultChoiceId: "stay_with_elder",
       choices: [
         {
-          id: "reef",
-          label: { fil: "Ituro ang mababaw na bahura", en: "Show them the shallow reef" },
+          id: "signal_approach",
+          label: { fil: "Magbigay ng hudyat kapag may papalapit", en: "Signal when someone approaches" },
           response: {
-            fil: "Ituro mo sa amin ang daan nila.",
-            en: "Show us the road they must take.",
+            fil: "Ipapaalam mo agad ang nakita mo. Makapaghahanda ang mga mandirigma.",
+            en: "You will report what you see. The warriors can prepare.",
           },
           routeTo: "mactan_defense",
         },
         {
-          id: "warn",
-          label: { fil: "Ilikas si Amihan at ang mga bata", en: "Get Amihan and the children to safety" },
+          id: "carry_message",
+          label: { fil: "Maghatid ng mensahe sa mga nakatatanda", en: "Carry a message to the elders" },
           response: {
-            fil: "Mabuti. Walang batang masasaktan ngayon.",
-            en: "Good. No child will be hurt today.",
+            fil: "Mabilis mong dinala ang mensahe. Sama-sama silang makapagpapasya.",
+            en: "You carry the message quickly. They can decide together.",
           },
           routeTo: "mactan_defense",
         },
         {
-          id: "spears",
-          label: { fil: "Ihanda ang mga sibat sa dalampasigan", en: "Ready the spears on the shore" },
-          response: { fil: "Maghanda. Malapit na sila.", en: "Get ready. They are close." },
+          id: "stay_with_elder",
+          label: { fil: "Manatili sa tabi ng isang nakatatanda", en: "Stay beside an elder" },
+          response: {
+            fil: "Mananatili kang malapit at tutulong sa anumang kailangan.",
+            en: "You stay close and help with what is needed.",
+          },
           routeTo: "mactan_defense",
         },
       ],
