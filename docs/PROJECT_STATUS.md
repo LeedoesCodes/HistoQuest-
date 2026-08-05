@@ -12,7 +12,10 @@ direction is [`MACTAN_FORMATION_COMBAT_SPEC.md`](MACTAN_FORMATION_COMBAT_SPEC.md
 which is the authoritative gameplay design for the Mactan battle mini-game.
 
 **Implementation has not started.** No gameplay code has changed. Phase 1 of the
-spec's migration plan (§18) is the next milestone.
+spec's migration plan (§18) is the next milestone, and is now **unblocked** — the
+2026-08-05 amendment (spec §21) resolved the depth-band coordinates, camera
+constants, presenter filename, and registry key it depends on, along with the
+coral reef's mechanical role and the encounter's completion model.
 
 ## Fallback baseline
 
@@ -87,12 +90,11 @@ BG-001 through BG-008 are approved and integrated. BG-002 through BG-008 were ge
 
 ## Next recommended task
 
-**Phase 1 of the Formation Combat migration plan** (spec §18): register a new
-presenter with the reoriented 2400 × 600 world, depth bands, camera model, and a
-movable player — no combat. The relay presenter stays registered and routed, so
-the game remains playable throughout.
+**Phase 1 of the Formation Combat migration plan** (spec §18), now unblocked:
+create `src/game/presenters/miniGames/mactanFormationCombat.ts` under the
+temporary key `mactan_formation_combat`, with the reoriented 2400 × 600 world,
+the five depth bands, the camera model, and a movable player — no combat. The
+relay presenter stays registered and routed, so the game remains playable
+throughout, and switching the story route requires a separate later approval.
 
-Before Phase 1 begins, the open items in spec §20.2 that Phase 1 depends on need
-resolution — the depth-band `y` ranges, the camera values, and the new presenter
-key and filename. The spec deliberately leaves them open rather than inventing
-them.
+Remaining open items (spec §20.2) all belong to Phase 2 or later.

@@ -1,7 +1,8 @@
 # Mactan Formation Combat — Authoritative Specification
 
-**Status:** Approved design. Implementation has not started.
+**Status:** Approved design. Implementation has not started. **Phase 1 is unblocked.**
 **Approved:** 2026-08-05
+**Amended:** 2026-08-05 — Milestone 0D resolved the implementation-blocking open items (§21).
 **Supersedes:** the relay-defense gameplay design and its freeze records.
 **Rollback target:** commit `80208ef27e73f4f770efc511ba7fb2232a5e43a2`, branch `mactan-relay-fallback-baseline`, tag `mactan-relay-fallback`.
 
@@ -17,11 +18,13 @@ binding: it records what has been approved versus what still needs a decision.
 | Mark | Meaning |
 |---|---|
 | **[FROZEN]** | Explicitly approved. Do not revise without a recorded design revision. |
+| **[TUNABLE]** | Approved **starting value**, not frozen final balance. May be adjusted by playtest without a design revision. The surrounding *rule* is frozen; only the number moves. |
 | **[DERIVED]** | Not stated in the approval, but mechanically entailed by a frozen decision or by existing repository architecture. Implementable; flag it if a playtest contradicts it. |
 | **[OPEN]** | Not specified by the approved design. **Requires approval before it is implemented.** Do not resolve an `[OPEN]` item by inventing a mechanic. |
 
 `[OPEN]` items are collected in §20. They are the known gaps in this
-specification, recorded deliberately rather than filled in.
+specification, recorded deliberately rather than filled in. §21 records which
+of them have since been resolved by amendment.
 
 ---
 
@@ -138,16 +141,28 @@ presenter's geometry carries over unexamined.
 **[FROZEN]** Terrain is represented as horizontal depth bands, ordered top to
 bottom:
 
-| Order | Band | Role |
-|---|---|---|
-| 1 | Horizon / ships | Backdrop. Non-playable. |
-| 2 | Deep-water approach | Enemy origin. |
-| 3 | Coral reef | Crossing hazard between approach and fighting zone. |
-| 4 | Shallows / fighting zone | The playable line. Defender formation stands here. |
-| 5 | Village / home | Behind the line. Protected. |
+| Order | Band | `y` range | Role |
+|---|---|---|---|
+| 1 | Horizon / distant ships | **0–90** | Scenic only. Non-playable by any actor. |
+| 2 | Deep-water approach | **90–210** | Enemy origin and entry. |
+| 3 | Coral reef | **210–320** | Crossing band between approach and fighting zone. |
+| 4 | Shallows / active fighting zone | **320–470** | The playable line. Defender formation stands here. |
+| 5 | Village / home | **470–600** | Protected. **Never entered by enemies.** |
 
-**[OPEN]** Exact `y` ranges for each band, and which bands are enterable by which
-actors.
+**[FROZEN]** The band ordering, their roles, and the rule that enemies never
+enter the village band.
+
+**[TUNABLE]** The `y` boundaries above are starting values and may be tuned
+during playtest.
+
+**[DERIVED]** Actor reachability follows from the frozen roles: enemies occupy
+bands 2–4 and are removed seaward at the top of band 2; defenders operate in
+band 4, with band 3 reachable only insofar as an approved Advance moves the
+formation seaward (§11); no actor enters band 1; and no enemy enters band 5.
+
+**[DERIVED]** The fighting zone is 150 px deep and the formation line sits
+within it, which is what keeps a 600 px-tall world readable under fixed vertical
+framing (§4.5) — the entire playable depth is always on screen.
 
 ### 4.3 Directional rules
 
@@ -182,8 +197,30 @@ off-screen pressure cues (§4.5) necessary rather than decorative.
 - **[FROZEN]** Optional temporary zoom-out is **deferred to polish**. Not in the
   initial baseline.
 
-**[OPEN]** Numeric camera values: deadzone dimensions, easing rate, look-ahead
-distance, and the visual form of the edge indicators.
+### 4.6 Camera constants (Phase 1 / Phase 2 starting values)
+
+| Constant | Value | Mark |
+|---|---|---|
+| World size | 2400 × 600 | **[FROZEN]** |
+| Base viewport | 800 × 600 | **[FROZEN]** |
+| Horizontal soft deadzone | ~**240 px** wide | **[TUNABLE]** |
+| Horizontal camera lerp | **0.10** | **[TUNABLE]** |
+| Directional / pressure look-ahead | ~**100 px** | **[TUNABLE]** |
+| Vertical framing | Fixed | **[FROZEN]** |
+| Camera bounds | Clamped to world edges | **[FROZEN]** |
+| Temporary multi-pressure zoom-out | Deferred to polish | **[FROZEN]** |
+
+**[FROZEN]** **Phase 1 may use a static camera window**, because the Phase 1
+sandbox does not yet need coastline patrol. **Semi-scrolling begins when the
+formation spans the coast** — that is, from the phase in which the line is
+present across the shoreline.
+
+**[DERIVED]** A 240 px deadzone inside an 800 px viewport leaves 280 px on each
+side before the camera moves, so ordinary attacking and repositioning near a
+pressure point will not scroll the view — the camera reacts to travel along the
+coast, not to local footwork.
+
+**[OPEN]** The visual form of the screen-edge indicators.
 
 ## 5. Formation data model
 
@@ -306,10 +343,18 @@ boundary).
 **[DERIVED]** The concurrency cap is described as **hard** — it is a correctness
 invariant to be asserted in tests (§17), not a soft pacing target.
 
+**[FROZEN]** Reef and deep-water crossing behaviour is resolved: invaders are
+slowed by band and recover more slowly from push and stagger while in coral
+(§12.1). Enemy movement speed is therefore always the archetype's base speed
+multiplied by its current band multiplier.
+
+**[DERIVED]** A **leader** participates in Phase 3 only (§13.3). It is a scripted
+encounter actor, not a fourth spawnable archetype, and does not count against the
+three-archetype rule above.
+
 **[OPEN]** Per-archetype behaviour: Pusher/Heavy's pressure mechanic and its
 counter; Ranged/Skirmisher's threat model, range, telegraph, and the counter
-(brace, positioning, or closing distance); spawn cadence and archetype mix; reef
-crossing behaviour and whether the reef slows or channels enemies.
+(brace, positioning, or closing distance); spawn cadence and archetype mix.
 
 ## 10. Combat resolution
 
@@ -374,14 +419,60 @@ shallows, on the invaders' path.
 
 **[DERIVED]** The reef is the environmental expression of the arc's central
 teachable ("mababaw ang tubig" — the water is shallow) and of the approved
-historical gate: large craft could not reach dry shore. It should have a
-mechanical consequence for invaders, not merely a visual one.
+historical gate: large craft could not reach dry shore.
 
-**[OPEN]** What the reef actually does mechanically (slow, channel, stagger, or
-none in the baseline); whether defenders may enter the reef or deep-water bands;
-whether terrain affects movement speed or footing; and whether tide or any
-dynamic terrain state exists. **The reef's mechanical role is the single largest
-unspecified system in this document.**
+### 12.1 Terrain effects
+
+**[FROZEN]** Terrain acts on invaders through **movement and recovery
+multipliers keyed to the depth band**, and nothing more.
+
+- **[FROZEN]** Invaders move **more slowly** in the deep-water and coral bands.
+- **[FROZEN]** Invaders recover **more slowly** from push and stagger while in
+  the coral band.
+- **[FROZEN]** Concentrated defender pressure is therefore **more effective**
+  while an invader has poor footing in coral or shallow water.
+- **[FROZEN]** Defenders move **normally** within the approved fighting area.
+- **[FROZEN]** **Coral does not automatically damage anyone.** No chip damage, no
+  environmental hazard.
+
+**[FROZEN]** The purpose is to let the player feel that shallow water and coral
+weakened the landing force.
+
+### 12.2 Implementation constraints
+
+**[FROZEN]** Terrain is implemented as **readable horizontal bands with simple
+multipliers**. Explicitly excluded from the baseline:
+
+- per-tile terrain
+- pathfinding
+- procedural obstacles
+- complex collision
+
+**[DERIVED]** A band lookup is therefore a function of `y` alone — the actor's
+current band selects its multipliers. No terrain geometry, grid, or navmesh is
+required, and none should be introduced.
+
+### 12.3 Starting multipliers
+
+**[TUNABLE]** Starting playtest values, **not frozen final balance**:
+
+| Multiplier | Value |
+|---|---|
+| Invader movement — deep water | **0.50** |
+| Invader movement — coral | **0.65** |
+| Invader movement — shallows | **0.80** |
+| Invader stagger/push recovery duration — coral | **× 1.35** |
+| Defender movement — fighting zone | **1.00** |
+
+**[DERIVED]** The gradient runs 0.50 → 0.65 → 0.80: invaders accelerate as they
+close, so the crossing reads as a costly approach that eases only once they
+reach the defenders — and the coral, where they are both slow and slow to
+recover, is the band where a doubled-up defender pair is most decisive. This is
+the frozen "two defenders clearly repel one" (§10) expressed through terrain
+rather than through a separate mechanic.
+
+**[OPEN]** Whether tide or any dynamic terrain state exists. Not required for the
+vertical slice; assume static bands.
 
 ## 13. Phase progression
 
@@ -391,12 +482,76 @@ at most **one** strong pressure cue during onboarding, at most **two** later
 
 **[FROZEN]** Maximum **2** automatic rally recoveries (§16).
 
-**[DERIVED]** The mode therefore has at least two pacing phases — an onboarding
-phase and a main phase — separated by a transition.
+**[FROZEN]** The encounter runs **three phases**.
 
-**[OPEN]** The full phase list, what triggers each transition, per-phase enemy
-composition and spawn pacing, encounter length, and the win condition that ends
-the encounter. **The encounter's actual end condition is not specified.**
+### 13.1 Phase 1 — Hold the waterline
+
+- **[FROZEN]** Begins with **Standard** invaders only.
+- **[FROZEN]** Completes after **4 total invaders have been repelled**.
+
+**[DERIVED]** This is the onboarding phase, so it carries the 1-strong-cue budget
+of §6.
+
+### 13.2 Phase 2 — Break the landing
+
+- **[FROZEN]** Permits the **broader initial enemy set** — Standard,
+  Pusher/Heavy, and Ranged/Skirmisher (§9).
+- **[FROZEN]** Completes when **both** conditions hold:
+  1. **8 total invaders** have been repelled (cumulative across the encounter);
+  2. the formation has **successfully advanced seaward at least once** to the
+     approved advance threshold.
+
+**[DERIVED]** The second condition is what makes Advance a required verb rather
+than an optional one: the player cannot finish Phase 2 by attrition alone, so
+the posture system must be understood before the leader arrives.
+
+**[OPEN]** The **advance threshold** — the seaward formation depth that counts as
+a successful Advance. It is referenced by the frozen completion rule but not yet
+given a value. Needed before Phase 4 of the migration plan, not before Phase 1.
+
+### 13.3 Phase 3 — Repel the leader
+
+- **[FROZEN]** The **leader** enters with **limited supporting enemies**.
+- **[FROZEN]** Completes when the leader's **repel stability is exhausted**.
+- **[FROZEN]** The leader and the remaining landing force **withdraw seaward**.
+- **[FROZEN]** **No graphic death is shown.**
+
+**[DERIVED]** "Repel stability" is the leader's analogue of defender composure
+(§10) — a pool that concentrated pressure exhausts, resolving in withdrawal
+rather than in a kill. This keeps the leader consistent with the frozen rule that
+invaders are repelled, never killed for score, and with the project's
+violence-implied-not-shown bar.
+
+**[DERIVED]** The leader is a **fourth encounter actor** alongside the three
+initial archetypes of §9. §9's "exactly three archetypes" governs the ordinary
+landing force; the leader is a single scripted Phase 3 participant, not a fourth
+spawnable archetype.
+
+**[OPEN]** The leader's repel-stability magnitude, its behaviour pattern, its
+telegraphs, and the composition of its limited support. Needed before migration
+Phase 6, not before Phase 1.
+
+### 13.4 Completion
+
+**Normal completion — [FROZEN]:** Phase 3 completion produces a historically
+correct **Mactan victory**.
+
+**Soft-fail completion — [FROZEN]:**
+
+- A **severe cohesion collapse** triggers an **automatic rally**.
+- Maximum automatic rallies: **2**.
+- A **third** severe collapse **auto-resolves the encounter as a modest one-star
+  Mactan victory**.
+- **Spain never wins. The village never falls. The narrative always continues.**
+
+**[DERIVED]** This closes the gap flagged in the previous revision: the third
+collapse now has a defined resolution, so the fixed-victory guarantee holds under
+every input path including sustained failure. Failure costs stars and
+decisiveness, never the outcome or the story.
+
+**[OPEN]** The definition of **severe cohesion collapse** as an evaluable
+condition, and the per-phase spawn pacing and enemy mix. Needed before migration
+Phase 6, not before Phase 1.
 
 ## 14. HUD and controls
 
@@ -435,6 +590,12 @@ is no HP and no kill counter; and the tutorialisation of postures.
 | Maximum automatic rally recoveries | **2** |
 | Strong pressure cues — onboarding | **1** |
 | Strong pressure cues — later | **2** |
+| Encounter phase 1 completion | **4** invaders repelled |
+| Encounter phase 2 completion | **8** invaders repelled (cumulative) **and** ≥1 successful Advance |
+| Third severe collapse | Auto-resolves as a **one-star** Mactan victory |
+
+**[TUNABLE]** Terrain multipliers are tabled in §12.3 and camera constants in
+§4.6. Both are starting playtest values.
 
 **[FROZEN]** One defender ≈ holds one ordinary invader; two defenders clearly
 repel one.
@@ -471,11 +632,19 @@ differently.
 contract (`score`, `attempts`, `msSpent`) and continue emitting behavioral
 events; the star model maps onto that contract rather than replacing it.
 
-**[OPEN]** The star thresholds; whether rallies are the sole star input or are
-combined with time, cohesion, or ground held; what "decisiveness" is as a
-measured quantity; and what happens if the line would fail a **third** time
-after both rallies are spent — the fixed outcome forbids a loss, so this state
-needs a defined resolution.
+**[FROZEN]** The third-collapse case is resolved (§13.4): after both rallies are
+spent, a third severe cohesion collapse **auto-resolves the encounter as a modest
+one-star Mactan victory**. The fixed outcome therefore holds under every input
+path, including sustained failure and idling.
+
+**[DERIVED]** One star is the floor, not a loss state. The star scale is
+anchored at the bottom by that auto-resolution and at the top by a Phase 3
+completion with rallies unspent.
+
+**[OPEN]** The star thresholds between those anchors; whether rallies are the
+sole star input or are combined with time, cohesion, or ground held; and what
+"decisiveness" is as a measured quantity. Needed before migration Phase 6, not
+before Phase 1.
 
 ## 17. Automated testing strategy
 
@@ -514,6 +683,30 @@ retired.
 
 **[FROZEN]** Implementation has **not** started. Phase 1 is the next milestone.
 
+### 18.1 Presenter and registry strategy
+
+**[FROZEN]** The redesign is built **beside** the verified relay fallback.
+
+| Item | Value |
+|---|---|
+| New presenter file | `src/game/presenters/miniGames/mactanFormationCombat.ts` |
+| Temporary registry key | `mactan_formation_combat` |
+
+**[FROZEN]** Do **not** replace or rename `mactanDefense.ts` or the
+`mactan_defense` key during the initial vertical-slice phases.
+
+**[FROZEN]** The relay presenter remains **playable and testable** until the
+Formation Combat vertical slice is accepted.
+
+**[FROZEN]** Switching the story route from `mactan_defense` to
+`mactan_formation_combat` **requires a later explicit approval**. It is not part
+of any phase's completion criteria until that approval is given.
+
+**[DERIVED]** Because the arc content still routes to `mactan_defense`, the new
+presenter is unreachable through normal play during Phases 1–6. It is reached by
+its registry key from the verification harness. That is intentional: it is what
+keeps the game demo-able throughout the redesign.
+
 **[FROZEN process]** Implementation proceeds in small playable milestones. Each
 milestone leaves the game playable, and each ends with build, automated
 verification, documentation update, and a stop for review.
@@ -529,13 +722,18 @@ gameplay design, and it is offered for approval rather than assumed:
 | **4** | Formation postures and pressure points (§6, §11). | The mode's decision layer. |
 | **5** | Pusher/Heavy and Ranged/Skirmisher archetypes (§9). | Full enemy composition. |
 | **6** | Phase progression, rally recoveries, star result, HUD (§13, §14, §16). | Complete vertical slice. |
-| **7** | Route the arc to Formation Combat; retire the relay presenter. | The cutover. Only after acceptance. |
+| **7** | Route the arc to Formation Combat; retire the relay presenter. | The cutover. Only after acceptance **and a separate explicit approval** (§18.1). |
 
 **[FROZEN]** Until the vertical slice is accepted, the relay-defense presenter
 remains the live implementation the arc routes to.
 
-**[OPEN]** Approval of this phase breakdown, and the new mini-game key and
-presenter filename.
+**[OPEN]** Approval of this phase breakdown. The presenter filename and registry
+key are resolved in §18.1.
+
+> **Terminology warning.** "Phase" is used for two different things in this
+> document. **Encounter phases 1–3** (§13) are in-game pacing stages. **Migration
+> phases 1–7** (this section) are implementation milestones. They are unrelated;
+> migration Phase 1 builds no encounter phase at all.
 
 ## 19. Risks and rollback strategy
 
@@ -591,31 +789,73 @@ kill counter, and no child combat.
 These are **not** playtest tunables. Each is a design decision the approved
 specification does not cover, and none may be resolved by inventing a mechanic.
 
-| § | Open item |
-|---|---|
-| 4.2 | Exact `y` ranges per depth band; which bands each actor may enter. |
-| 4.5 | Camera deadzone, easing, look-ahead values; edge-indicator visual form. |
-| 5 | Slot model; whether the player occupies a slot; gap handling on knockdown. |
-| 6 | Pressure-point computation, thresholds, signalling, and cue persistence. |
-| 7 | Attack timings; brace as hold or parry; dash distance/cooldown/invulnerability; cancel rules. |
-| 8 | Ally leash radius; local target selection; double-engagement; recovery. |
-| 9 | Per-archetype behaviour and counters; spawn cadence and mix; reef crossing. |
-| 10 | The composure model; knockdown threshold and duration; the numeric expression of hold-vs-repel. |
-| 11 | Evaluable definitions of "safe" and "cohesive"; Fall Back duration/distance; command scope. |
-| 12 | **The reef's mechanical role** — the largest unspecified system here. |
-| 13 | Full phase list and triggers; **the encounter's end condition**. |
-| 14 | Bindings and touch layout; posture presentation; what the HUD shows. |
-| 16 | Star thresholds; the meaning of "decisiveness"; resolution when the line would fail after both rallies are spent. |
-| 17 | New suite filename, script name, and DEV hook surface. |
-| 18 | Approval of the phase breakdown; new mini-game key and presenter filename. |
+Items are grouped by the earliest **migration phase** (§18) that cannot proceed
+without them. Nothing in this table blocks migration Phase 1.
+
+| § | Open item | Blocks from |
+|---|---|---|
+| 4.5 | Visual form of the screen-edge indicators. | Phase 4 |
+| 5 | Slot model; whether the player occupies a slot; gap handling on knockdown. | Phase 2 |
+| 6 | Pressure-point computation, thresholds, signalling, and cue persistence. | Phase 4 |
+| 7 | Attack timings; brace as hold or parry; dash distance/cooldown/invulnerability; cancel rules. | Phase 3 |
+| 8 | Ally leash radius; local target selection; double-engagement; recovery. | Phase 2 |
+| 9 | Per-archetype behaviour and counters; spawn cadence and mix. | Phase 3 (Standard) / Phase 5 (others) |
+| 10 | The composure model; knockdown threshold and duration; the numeric expression of hold-vs-repel. | Phase 3 |
+| 11 | Evaluable definitions of "safe" and "cohesive"; Fall Back duration/distance; command scope. | Phase 4 |
+| 12.3 | Whether tide or dynamic terrain state exists (assume static for the slice). | Not blocking |
+| 13.2 | The **advance threshold** referenced by encounter-phase-2 completion. | Phase 4 |
+| 13.3 | Leader repel-stability magnitude, pattern, telegraphs, and support composition. | Phase 6 |
+| 13.4 | Definition of **severe cohesion collapse**; per-phase spawn pacing and mix. | Phase 6 |
+| 14 | Bindings and touch layout; posture presentation; what the HUD shows. | Phase 6 |
+| 16 | Star thresholds between the one-star floor and a clean Phase 3 completion; the meaning of "decisiveness". | Phase 6 |
+| 17 | New suite filename, script name, and DEV hook surface. | Phase 1 — **resolve at implementation time with the milestone's verification plan** |
+| 18 | Approval of the migration phase breakdown. | Phase 1 — process approval, not a design gap |
 
 ### 20.3 Playtest tunables
 
-Values expected to move during playtest without a design revision: formation span
-(~1600 px) and slot spacing; movement, attack, brace, and dash timings; enemy
-spawn cadence and wade speed; composure rates and knockdown durations; camera
-easing and look-ahead; pressure-point thresholds; and phase pacing.
+Values expected to move during playtest without a design revision: the depth-band
+`y` boundaries (§4.2); all camera constants except the world and viewport sizes
+(§4.6); all terrain multipliers (§12.3); formation span (~1600 px) and slot
+spacing; movement, attack, brace, and dash timings; enemy spawn cadence and base
+speed; composure rates and knockdown durations; pressure-point thresholds; the
+encounter-phase repel counts (4 and 8); and phase pacing.
 
-The following are **not** tunable: the enemy concurrency cap of 5, the maximum of
-2 rally recoveries, the cue budget of 1 onboarding / 2 later, the fixed victory,
-and the rule that the formation never enters the village band.
+The following are **not** tunable: the world size of 2400 × 600 and the 800 × 600
+viewport; fixed vertical framing; the depth-band ordering and their roles; the
+enemy concurrency cap of 5; the maximum of 2 rally recoveries and the one-star
+auto-resolution on a third collapse; the cue budget of 1 onboarding / 2 later;
+the fixed Mactan victory; the rule that enemies never enter the village band and
+the formation never falls back into it; and the rule that coral never damages
+anyone.
+
+---
+
+## 21. Amendment record
+
+### 2026-08-05 — Milestone 0D: implementation blockers resolved
+
+Resolved the open items that blocked migration Phase 1, plus the two systems
+previously flagged as the largest gaps. No frozen decision was reopened, no
+mechanic was added beyond the approved amendments, and the combat model is
+unchanged.
+
+| § | Resolved |
+|---|---|
+| 4.2 | Depth-band `y` ranges (0–90 / 90–210 / 210–320 / 320–470 / 470–600) and actor reachability. |
+| 4.6 | Camera constants; Phase 1 may use a static camera window; semi-scrolling begins when the formation spans the coast. |
+| 9 | Reef/deep-water crossing behaviour; leader recorded as a scripted Phase 3 actor, not a fourth archetype. |
+| 12 | **The coral reef's mechanical role** — band-keyed movement and recovery multipliers, no damage, no per-tile terrain or pathfinding. |
+| 13 | **The encounter's end condition** — three encounter phases with explicit completion criteria. |
+| 13.4 / 16 | Soft-fail path completed: a third severe collapse auto-resolves as a one-star Mactan victory. |
+| 18.1 | Presenter filename `mactanFormationCombat.ts` and temporary registry key `mactan_formation_combat`; relay presenter and route preserved; cutover needs separate approval. |
+
+**Newly opened by this amendment** (each entailed by an approved rule that did
+not carry a value): the advance threshold (§13.2); the leader's repel-stability
+magnitude and pattern (§13.3); and the definition of severe cohesion collapse
+(§13.4). None blocks migration Phase 1.
+
+**Phase 1 readiness: unblocked.** Migration Phase 1 delivers the reoriented
+world, depth bands, camera, and a movable player. Every input it requires — world
+size, band boundaries, camera constants, presenter filename, registry key, and
+the rule that the relay route is untouched — is now recorded. The remaining open
+items all belong to Phase 2 or later.
