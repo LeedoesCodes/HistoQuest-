@@ -17,6 +17,10 @@ This log records only results evidenced by repository scripts or reported playte
 
 | 2026-08-03 | Static per-node Mactan story backgrounds | `npm.cmd run typecheck`, `npm.cmd run build`, and `git diff --check` passed | Playwright sampled the Reef story slide over 90 frames and after 20 seconds; the existing Filipino/English integrated-scene screenshots retain the same initial framing | Continuous background drift was visible during dialogue scenes | Removed only the `StoryBackdrop.buildSlide()` motion tween | Cross-fades and all target-device image/title/dialogue checks remain appropriate if a specific regression is reported |
 
+| 2026-08-05 | Mactan Formation Combat migration Phase 1 sandbox | `npm.cmd run typecheck`, `npm.cmd run test:mactan` (relay, unchanged), `npm.cmd run test:mactan:formation` (new, 33 checks), `npm.cmd run build`, and `git diff --check` all passed | Filipino and English sandbox screenshots reviewed at 900 × 680, plus attack-exchange, brace, knockdown, recovery, and withdrawal captures | The invader sprite rendered underneath the HUD hint text, at spawn and again while withdrawing — visible only in screenshots; every state check passed while the defect was present | Invader spawn moved from y=130 to y=180 and a withdrawal alpha fade added from y=150; no mechanic changed | Attack/brace/dash timings and the readability of the shallow-oblique depth still need a focused human playtest |
+
+| 2026-08-05 | Mactan Formation Combat — Combat Foundation Pass (invader poise, repel-stability regeneration, guard-metered brace, looping respawn, defender animations, hit feedback) | `npm.cmd run typecheck`, `npm.cmd run test:mactan` (relay, unchanged), `npm.cmd run test:mactan:formation` (47 checks, up from 33), `npm.cmd run build`, and `git diff --check` all passed | Filipino and English screenshots reviewed, including the guard state and a mid-flash impact frame | The new ally-footing HUD bar collided with the deep-water band label, and the ally stood inside the invader's sprite — both visible only in screenshots while all state checks passed | Deep-water band label moved clear of the HUD stack; the ally now takes a lateral standoff so the two defenders read as flanking | Attack, brace and lane-free positioning feel remain unplaytested; `STABILITY_REGEN` is the first constant to tune |
+
 ## Required Mactan automated baseline
 
 Run after any change affecting Mactan mini-game state, spawning/completion, Hold, Fall Back, defense stages, breaches/repels, covered camera/HUD behavior, or result flow:
@@ -25,6 +29,11 @@ Run after any change affecting Mactan mini-game state, spawning/completion, Hold
 2. `npm.cmd run test:mactan`
 3. `npm.cmd run build`
 4. `git diff --check`
+
+For a change affecting the Formation Combat presenter, add
+`npm.cmd run test:mactan:formation`. That suite reads `dist/`, so run it **after**
+`npm.cmd run build` — its production-hook check needs a current bundle. The relay
+suite `test:mactan` stays unchanged and must keep passing regardless.
 
 Report those automated results separately from manual playtests. Do not expand hooks or tests unless an approved future state cannot be verified through the current interface.
 

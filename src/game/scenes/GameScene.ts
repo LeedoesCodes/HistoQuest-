@@ -17,7 +17,7 @@ import { COLORS, FONT } from "../ui/theme";
 import { burst, pop, showStars, starsFor } from "../ui/juice";
 import { makePanel, makeButton } from "../ui/panel";
 import { sfx } from "../ui/sfx";
-import { L, t } from "../i18n";
+import { L, t, setLanguage } from "../i18n";
 import { IMAGE_URLS } from "../assets/images";
 import { loadSpriteSheets } from "../assets/sprites";
 import { createBackdrop } from "../ui/backdrop";
@@ -54,7 +54,33 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.setBackgroundColor(COLORS.bg);
+    if (import.meta.env.DEV) {
+      // DEV-ONLY mini-game sandbox: `?sandbox=<registry key>` runs one presenter
+      // on a loop instead of the arc flow. Needed because a presenter under
+      // development is not routed from arc content yet — it changes no routing
+      // and is stripped from production builds.
+      const params = new URLSearchParams(window.location.search);
+      const sandboxKey = params.get("sandbox");
+      if (sandboxKey) {
+        if (params.get("lang") === "en") setLanguage("en");
+        void this.sandboxLoop(sandboxKey);
+        return;
+      }
+    }
     void this.mainLoop();
+  }
+
+  /** DEV-only: replay a single mini-game presenter by registry key. */
+  private async sandboxLoop(key: string) {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      await getMiniGame(key)(this, {
+        id: "sandbox",
+        type: "minigame",
+        key,
+        title: { fil: "Sandbox", en: "Sandbox" },
+      });
+    }
   }
 
   /** Arc select → play arc → summary → back to arc select, forever. */

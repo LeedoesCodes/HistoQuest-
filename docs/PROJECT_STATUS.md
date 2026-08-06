@@ -11,16 +11,41 @@ The previous Mactan gameplay feature freeze is **superseded**. It was lifted on
 direction is [`MACTAN_FORMATION_COMBAT_SPEC.md`](MACTAN_FORMATION_COMBAT_SPEC.md),
 which is the authoritative gameplay design for the Mactan battle mini-game.
 
-**Implementation has not started.** No gameplay code has changed. Phase 1 of the
-spec's migration plan (§18) is the next milestone, and is now **unblocked** — the
-2026-08-05 amendment (spec §21) resolved the depth-band coordinates, camera
-constants, presenter filename, and registry key it depends on, along with the
-coral reef's mechanical role and the encounter's completion model.
+**Migration Phase 1 is complete** (2026-08-05): an isolated combat sandbox at
+`src/game/presenters/miniGames/mactanFormationCombat.ts`, registered under the
+temporary key `mactan_formation_combat`. Phase 2 has **not** started.
+
+The sandbox implements the reoriented 2400 × 600 world (sea at the top, village
+at the bottom), the five depth bands with their movement and recovery
+multipliers, one static camera window, one player-controlled adult defender
+(move / deliberate attack / brace / repositioning dash, no jump), one
+persistently engaging ally, and one Standard invader that wades in, can be
+pushed and staggered, and withdraws seaward when its repel stability is
+exhausted. Combat is footing/composure and knockdown throughout; nothing is
+killed and nothing is scored.
+
+Not in Phase 1, by design: formation slots, pressure points, formation commands,
+encounter phases, the leader, star results, and semi-scrolling.
+
+**Combat Foundation Pass** (2026-08-05) followed Phase 1 in the same presenter.
+Invaders gained a **poise** pool: hits chip poise and only a poise break
+staggers, so an invader can no longer be perpetually stunlocked and does land
+attacks. Repel stability gained **regeneration**, paused while the invader is
+staggered, which implements the frozen "one defender holds, two defenders
+repel" equation — a lone defender cannot finish an ordinary invader. Brace
+became a **guard** resource that drains while held, is spent absorbing hits, and
+breaks when emptied; composure no longer regenerates while bracing. A repelled
+invader is now **replaced automatically** so the sandbox loops for playtesting.
+Presentation gained the shipped defender **walk/attack/idle animations** (the
+sheets were already loaded but unused) and lightweight **hit feedback** —
+hitstop, flash, and directional recoil.
 
 ## Fallback baseline
 
 The relay-defense mini-game remains the **live, routed implementation** and the
 verified rollback target until the Formation Combat vertical slice is accepted.
+`mactanDefense.ts`, the `mactan_defense` key, the story route, and
+`scripts/verify_mactan.mjs` are all unchanged by Phase 1.
 
 | Reference | Value |
 |---|---|
@@ -45,7 +70,7 @@ any excluded asset or documentation change.
 
 ## Systems in progress
 
-- Mactan Formation Combat: specification recorded and approved; implementation not begun.
+- Mactan Formation Combat: specification approved; migration Phase 1 sandbox complete and verified. Phase 2 (formation data model and autonomous allies) not started.
 - Visual asset production for a consistent Mactan presentation. The approved source of truth is [`ART_PRODUCTION_GUIDE.md`](../ART_PRODUCTION_GUIDE.md).
 - Asset inventory and production planning, recorded in [`ASSET_TRACKER.md`](ASSET_TRACKER.md).
 
@@ -90,11 +115,12 @@ BG-001 through BG-008 are approved and integrated. BG-002 through BG-008 were ge
 
 ## Next recommended task
 
-**Phase 1 of the Formation Combat migration plan** (spec §18), now unblocked:
-create `src/game/presenters/miniGames/mactanFormationCombat.ts` under the
-temporary key `mactan_formation_combat`, with the reoriented 2400 × 600 world,
-the five depth bands, the camera model, and a movable player — no combat. The
-relay presenter stays registered and routed, so the game remains playable
-throughout, and switching the story route requires a separate later approval.
+**A focused human playtest of the Phase 1 sandbox**, reachable in development at
+`/?sandbox=mactan_formation_combat` (add `&lang=en` for English). Automated
+verification confirms the mechanics resolve correctly; only a playtest can
+confirm whether the attack, brace, and dash timings feel right for a Grade 5
+player, and whether the shallow-oblique presentation reads as depth.
 
-Remaining open items (spec §20.2) all belong to Phase 2 or later.
+**Then Phase 2** (formation data model and 7 autonomous allies), which first
+needs the spec §20.2 items marked "blocks from Phase 2" resolved: the slot model
+and the ally leash and target-selection rules.
