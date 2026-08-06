@@ -155,6 +155,7 @@ export const MESSAGES = {
   "mg.formation.dash": { fil: "USOG", en: "DASH" },
   "mg.formation.done": { fil: "TAPOS", en: "DONE" },
   "mg.formation.push": { fil: "Naitulak!", en: "Pushed!" },
+  "mg.formation.driven": { fil: "Naitaboy paurong!", en: "Driven back!" },
   "mg.formation.chip": { fil: "Tulong!", en: "Support!" },
   "mg.formation.blocked": { fil: "Nasangga!", en: "Blocked!" },
   "mg.formation.knocked": { fil: "Natumba! Babangon...", en: "Knocked down! Getting up..." },

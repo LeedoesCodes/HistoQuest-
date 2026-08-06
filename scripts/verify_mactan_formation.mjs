@@ -91,7 +91,9 @@ async function run() {
     check("1c. player starts in the shallows fighting zone", initial.player.band === "shallows", initial.player.band);
     await shoot(page, "01-initial-fil.png");
 
-    // ---- 3. movement respects Phase 1 bounds ----
+    // ---- 3. movement respects the lane model ----
+    check("1d. three lanes are defined", initial.lanes.count === 3 && initial.lanes.y.length === 3,
+      JSON.stringify(initial.lanes.y));
     await call(page, "movePlayerTo", [99999, 99999]);
     const clampedHigh = await state(page);
     await call(page, "movePlayerTo", [-99999, -99999]);
@@ -99,11 +101,33 @@ async function run() {
     check("3. movement clamps to the sandbox x bounds",
       clampedHigh.player.x === initial.bounds.maxX && clampedLow.player.x === initial.bounds.minX,
       `${clampedLow.player.x}..${clampedHigh.player.x}`);
-    check("3b. movement clamps to the fighting-zone y bounds",
-      clampedHigh.player.y === initial.bounds.maxY && clampedLow.player.y === initial.bounds.minY,
-      `${clampedLow.player.y}..${clampedHigh.player.y}`);
-    check("3c. the player never enters the village band", clampedHigh.player.y < initial.bounds.villageTop,
-      `maxY=${clampedHigh.player.y} villageTop=${initial.bounds.villageTop}`);
+    check("3b. depth snaps to a lane instead of free Y",
+      clampedHigh.player.lane === 2 && clampedLow.player.lane === 0 &&
+      clampedHigh.player.y === initial.lanes.y[2] && clampedLow.player.y === initial.lanes.y[0],
+      `lanes ${clampedLow.player.lane}..${clampedHigh.player.lane}`);
+    check("3c. the village band is structurally unreachable — no lane exists past lane 2",
+      initial.lanes.y[2] < initial.bounds.villageTop,
+      `deepest lane y=${initial.lanes.y[2]} villageTop=${initial.bounds.villageTop}`);
+
+    // ---- L. lane stepping ----
+    await call(page, "setPlayerLane", [2]);
+    await call(page, "stepLane", [-1]);
+    const midStep = await state(page);
+    check("L1. a lane step begins a transition", midStep.player.laneShifting === true || midStep.player.lane === 1);
+    await sleep(300);
+    const settled = await state(page);
+    check("L2. the step settles on the next lane seaward", settled.player.lane === 1 && settled.player.laneShifting === false,
+      `lane=${settled.player.lane}`);
+    check("L3. lane changes are counted", settled.player.laneChanges >= 1, `${settled.player.laneChanges}`);
+    await call(page, "stepLane", [-1]); await sleep(300);
+    await call(page, "stepLane", [-1]); await sleep(300);
+    const atSurf = await state(page);
+    check("L4. lane stepping clamps at the surf line", atSurf.player.lane === 0, `lane=${atSurf.player.lane}`);
+    await call(page, "stepLane", [1]); await sleep(300);
+    await call(page, "stepLane", [1]); await sleep(300);
+    await call(page, "stepLane", [1]); await sleep(300);
+    const atFirm = await state(page);
+    check("L5. lane stepping clamps at the firm shallows", atFirm.player.lane === 2, `lane=${atFirm.player.lane}`);
 
     // ---- 4. attack transitions windup -> active -> recovery ----
     await call(page, "resetSandbox");
@@ -128,8 +152,9 @@ async function run() {
     check("5. attack reduces invader repel stability",
       afterHit.enemy.repelStability < beforeHit.enemy.repelStability,
       `${beforeHit.enemy.repelStability} -> ${afterHit.enemy.repelStability}`);
-    check("5b. attack pushes the invader seaward (upward)", afterHit.enemy.y < beforeHit.enemy.y,
-      `y ${Math.round(beforeHit.enemy.y)} -> ${Math.round(afterHit.enemy.y)}`);
+    check("5b. attack recoils the invader along the shore, not out of reach",
+      afterHit.enemy.x !== beforeHit.enemy.x && afterHit.enemy.lane === beforeHit.enemy.lane,
+      `x ${Math.round(beforeHit.enemy.x)} -> ${Math.round(afterHit.enemy.x)}, lane ${afterHit.enemy.lane}`);
     check("5c. a single hit chips poise without staggering", afterHit.enemy.staggered === false && afterHit.enemy.poise < 100,
       `poise=${afterHit.enemy.poise}`);
     await shoot(page, "02-attack-exchange.png");
@@ -158,18 +183,78 @@ async function run() {
     check("S1. repel stability regenerates when pressure stops", afterRegen > beforeRegen,
       `${beforeRegen.toFixed(1)} -> ${afterRegen.toFixed(1)}`);
 
+    // ---- GROUND AS PROGRESS: the invader's lane tracks its repel stability ----
+    await call(page, "resetSandbox");
+    await call(page, "landEnemy");
+    await sleep(900);                                   // let it work inland
+    const dug = await state(page);
+    check("D1. a fresh invader advances inland from the surf line", dug.enemy.lane === 2,
+      `lane=${dug.enemy.lane}`);
+    await call(page, "setStability", [50]);
+    await sleep(600);
+    const mid = await state(page);
+    check("D2. wearing it down drives it a lane seaward", mid.enemy.lane === 1, `lane=${mid.enemy.lane}`);
+    await call(page, "setStability", [20]);
+    await sleep(600);
+    const surf = await state(page);
+    check("D3. wearing it down further drives it to the surf line", surf.enemy.lane === 0, `lane=${surf.enemy.lane}`);
+    // Hysteresis ladder: inside [67, 77) the raw threshold says lane 2 but the
+    // ladder refuses it, so a flicker at the boundary cannot hand back ground.
+    // The window is kept short so stability regeneration stays under 77.
+    await call(page, "setStability", [67]);
+    await sleep(400);
+    const held = await state(page);
+    check("D4. the hysteresis ladder stops it retaking ground on a flicker",
+      held.enemy.lane === 1, `stability~70 lane=${held.enemy.lane}`);
+    await call(page, "setStability", [95]);
+    await sleep(900);
+    const regained = await state(page);
+    check("D5. a genuinely recovered invader does retake ground", regained.enemy.lane === 2,
+      `stability~95 lane=${regained.enemy.lane}`);
+
+    // Composition review captures: the player standing in each of the three
+    // lanes, and the invader mid-way through being driven seaward.
+    await call(page, "resetSandbox");
+    await call(page, "landEnemy");
+    await sleep(1200);
+    await call(page, "setPlayerLane", [2]); await sleep(400);
+    await shoot(page, "09-lane2-firm.png");
+    await call(page, "setPlayerLane", [1]); await sleep(400);
+    await shoot(page, "10-lane1-mid.png");
+    await call(page, "setPlayerLane", [0]); await sleep(400);
+    await shoot(page, "11-lane0-surf.png");
+    await call(page, "setStability", [20]);
+    await sleep(180);
+    await shoot(page, "12-driven-seaward.png");
+
+    // ---- the ally holds the line with the player, and does not chase seaward ----
+    await call(page, "resetSandbox");
+    await call(page, "landEnemy");
+    await call(page, "setPlayerLane", [1]);
+    await sleep(1400);
+    const allyLane = await state(page);
+    check("A1. the ally holds the player's lane", allyLane.ally.lane === 1,
+      `ally=${allyLane.ally.lane} player=${allyLane.player.lane}`);
+    check("A2. a full-strength invader comes to the defenders' lane",
+      allyLane.enemy.lane === 1, `enemy=${allyLane.enemy.lane}`);
+
     // ---- HOLD ALONE: a lone defender cannot repel an ordinary invader ----
     // Attacks are issued at the player's ideal cadence with the ally parked.
     await call(page, "resetSandbox");
     await call(page, "parkAlly");
-    for (let i = 0; i < 20; i++) {
+    // 32 hits at the player's ideal cadence — ~19 s of flawless uninterrupted
+    // pressure, well past the ~20 s at which a lone defender used to win. This
+    // window is the guard on the frozen "one defender holds" invariant.
+    for (let i = 0; i < 32; i++) {
       await call(page, "forceEnemyHit");
       await sleep(600);
     }
     const loneResult = await state(page);
     check("S2. a lone defender HOLDS but does not repel (spec §10)",
       loneResult.enemy.repelStability > 0 && loneResult.enemy.state !== "withdrawing" && loneResult.enemy.state !== "repelled",
-      `stability=${loneResult.enemy.repelStability.toFixed(1)} state=${loneResult.enemy.state}`);
+      `stability=${loneResult.enemy.repelStability.toFixed(1)} state=${loneResult.enemy.state} lane=${loneResult.enemy.lane}`);
+    check("S3. a lone defender still gains visible ground",
+      loneResult.enemy.lane < 2, `lane=${loneResult.enemy.lane}`);
 
     // ---- 6. brace substantially reduces a forced hit ----
     await call(page, "resetSandbox");
@@ -239,7 +324,7 @@ async function run() {
     await call(page, "resetSandbox");
     await call(page, "movePlayerTo", [1200, 400]);
     const preDash = await state(page);
-    await call(page, "dash", [-1, 0]);
+    await call(page, "dash", [-1]);
     await sleep(300);
     const postDash = await state(page);
     check("7. dash moves the player", Math.abs(postDash.player.x - preDash.player.x) > 100,
@@ -306,14 +391,14 @@ async function run() {
 
     // ---- SANDBOX LOOP: a repelled invader is replaced automatically ----
     const countAfterRepel = (await state(page)).repelledCount;
-    check("L1. a repel is counted", countAfterRepel >= 1, `count=${countAfterRepel}`);
+    check("R1. a repel is counted", countAfterRepel >= 1, `count=${countAfterRepel}`);
     let respawned = false;
     for (let i = 0; i < 40; i++) {
       const s = await state(page);
       if (s.enemy.state === "wading" && s.enemy.repelStability === 100) { respawned = true; break; }
       await sleep(200);
     }
-    check("L2. a fresh invader arrives without a manual reset", respawned);
+    check("R2. a fresh invader arrives without a manual reset", respawned);
 
     // ---- the invader never enters the village band ----
     await call(page, "resetSandbox");
