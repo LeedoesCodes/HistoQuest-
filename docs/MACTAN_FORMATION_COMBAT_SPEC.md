@@ -121,69 +121,109 @@ functional until the vertical slice is accepted (§19).
 
 ## 4. Battlefield coordinate and camera model
 
+> **Amended 2026-08-06 (§22).** §4.1–4.3 below replace the previous
+> sea-at-top / village-at-bottom cross-section and the three-lane model. The
+> earlier version is preserved in git at tag `formation-phase1-freeform` and
+> branch `feature/mactan-lane-geometry`.
+
 ### 4.1 World and axes
 
 - **[FROZEN]** World is approximately **2400 × 600**.
-- **[FROZEN]** The **long horizontal axis is the shoreline**.
-- **[FROZEN]** The **short vertical axis is sea-to-village depth**.
-- **[FROZEN]** **Sea at the top. Village at the bottom.**
-- **[FROZEN]** Presentation is **shallow-oblique 3/4** — not a pure side view and
-  not a pure top-down.
-- **[FROZEN]** The battlefield must read as **one continuous shoreline**, never as
-  separate combat arenas.
+- **[FROZEN]** The **long horizontal axis is the sea-to-village depth axis.**
+  **Sea and ships at the right. Village and home at the left.**
+- **[FROZEN]** Presentation is a **pure side view** on **one continuous ground
+  line**, with gravity. Characters are **side-facing at all times**.
+- **[FROZEN]** The camera **side-scrolls horizontally** with the player. Vertical
+  framing is fixed.
+- **[FROZEN]** The battlefield must read as **one continuous coast**, never as
+  separate arenas.
 
-This is a full reorientation. Under the relay design the vertical axis was
-elevation and gravity; here it is depth into the water. Nothing in the relay
-presenter's geometry carries over unexamined.
+**Why this replaced the previous model.** The earlier cross-section put the
+shoreline on the horizontal axis with the sea above, and quantised depth into
+three lanes. A manual playtest found that vertical lane movement fights the
+side-facing sprite set: with no perspective ground plane, no shadows, and a lane
+pitch near a full body height, stepping "back" read as levitating. Side-facing
+art and a horizontal-only movement axis are mutually reinforcing; the lane model
+put them in permanent conflict.
 
-### 4.2 Depth bands
+### 4.2 Terrain regions
 
-**[FROZEN]** Terrain is represented as horizontal depth bands, ordered top to
-bottom:
+**[FROZEN]** Terrain is a left-to-right sequence of regions along the ground:
 
-| Order | Band | `y` range | Role |
+| Order | Region | `x` range | Role |
 |---|---|---|---|
-| 1 | Horizon / distant ships | **0–90** | Scenic only. Non-playable by any actor. |
-| 2 | Deep-water approach | **90–210** | Enemy origin and entry. |
-| 3 | Coral reef | **210–320** | Crossing band between approach and fighting zone. |
-| 4 | Shallows / active fighting zone | **320–470** | The playable line. Defender formation stands here. |
-| 5 | Village / home | **470–600** | Protected. **Never entered by enemies.** |
+| 1 | Village / home | **0–760** | Protected. **Never entered by invaders.** |
+| 2 | Dry sand | **760–1380** | Firm ground. Invaders are at full strength here. |
+| 3 | Wet sand and shoreline | **1380–1700** | The waterline. Neutral ground. |
+| 4 | Shallows | **1700–2100** | Invaders slowed and unsteady. |
+| 5 | Coral reef and grounded boats | **2100–2400** | Invader origin. Worst footing of all. |
 
-**[FROZEN]** The band ordering, their roles, and the rule that enemies never
-enter the village band.
+**[FROZEN]** The region ordering, their roles, and the rule that invaders never
+enter the village region.
 
-**[TUNABLE]** The `y` boundaries above are starting values and may be tuned
-during playtest.
+**[TUNABLE]** The `x` boundaries are starting values.
 
-**[DERIVED]** Actor reachability follows from the frozen roles: enemies occupy
-bands 2–4 and are removed seaward at the top of band 2; defenders operate in
-band 4, with band 3 reachable only insofar as an approved Advance moves the
-formation seaward (§11); no actor enters band 1; and no enemy enters band 5.
+**[DERIVED]** These boundaries match the already-approved `MAC-ENV-001`
+background prompt, which describes exactly this cross-section with a ground
+baseline at y=536. That asset becomes usable as written rather than needing a
+rewrite.
 
-**[DERIVED]** The fighting zone is 150 px deep and the formation line sits
-within it, which is what keeps a 600 px-tall world readable under fixed vertical
-framing (§4.5) — the entire playable depth is always on screen.
+**[DERIVED]** Sky, sea and the anchored ships occupy the upper portion of the
+frame as scenery above the ground line, so the ships stay visible as the
+chapter's thesis regardless of camera position.
 
 ### 4.3 Directional rules
 
-- **[FROZEN]** Enemies wade **downward** from the sea.
-- **[FROZEN]** Repelled enemies are pushed **upward** toward the sea.
-- **[FROZEN]** Advance moves the formation **seaward** (up).
-- **[FROZEN]** Fall Back moves the formation slightly **toward home** (down) but
-  **never into the village**.
+- **[FROZEN]** Invaders wade **leftward** from the boats toward the village.
+- **[FROZEN]** Repelled invaders are pushed **rightward**, back toward the sea.
+- **[FROZEN]** Advance moves the defenders **seaward (right)**.
+- **[FROZEN]** Fall Back moves them **toward home (left)** but **never into the
+  village region**.
+- **[FROZEN]** An invader that gets past the defenders continues **left** toward
+  the village. It never reaches it — see §16.
 
-**[DERIVED]** A hard lower boundary is therefore required on formation position:
-Fall Back must clamp above the village band. This is the structural guarantee
+**[DERIVED]** The village-region boundary at x=760 is the structural guarantee
 behind "the village never falls" (§16) and must not be left to tuning.
+
+### 4.3.1 The tide of battle — position as difficulty
+
+**[FROZEN]** **Where the fighting is happening determines who is winning**, and
+that is the mode's central strategic mechanic.
+
+- Invaders on dry sand are at **full speed and firm footing**.
+- Invaders in the shallows are **slowed and stagger easily**.
+- Invaders driven back onto the reef **can barely stand**.
+- Defenders are unaffected by terrain — they know this water.
+
+**[FROZEN]** **The position of the front line is the primary progress
+indicator.** No bar is required: a glance at where the fighting is happening,
+relative to the waterline, says who is winning.
+
+**[FROZEN]** **Pushing forward carries a cost.** The further seaward the fight
+is, the longer an invader who slips past has to run at the village unopposed.
+Advancing buys terrain advantage and spends rear security. This counterweight is
+what stops the terrain advantage from snowballing, and it is not optional.
+
+**[DERIVED]** This is the historical claim rendered as a mechanic: Mactan won
+because the fight happened in their water and not on open ground. It reuses
+§12's terrain multipliers unchanged.
 
 ### 4.4 Formation span
 
-- **[FROZEN]** Starting formation span is approximately **1600 px** within the
-  2400 px coast, and **remains a playtest tuning value**.
+> **Amended 2026-08-06 (§22).** With the sea now at the right, the defenders no
+> longer span a coastline. They hold a **front** whose position along the
+> sea-to-village axis is the state of the battle (§4.3.1).
 
-**[DERIVED]** With 8 defenders across ~1600 px, nominal spacing is ~200 px. The
-800 px camera viewport shows roughly 4 defenders at once, which is what makes
-off-screen pressure cues (§4.5) necessary rather than decorative.
+- **[FROZEN]** The defenders' front starts at the **waterline**, near x=1380–1700.
+- **[FROZEN]** Individual defenders spread over a **contested stretch** of a few
+  hundred pixels around the front rather than standing on a single point, so
+  several separate scuffles run at once.
+- **[TUNABLE]** The width of that stretch.
+
+**[DERIVED]** Several scuffles strung along a few hundred pixels is what
+preserves the "which fight do I join?" decision on a single axis: joining one
+makes it two-on-one, that invader is shoved seaward, and the freed ally moves to
+the next. That is the frozen §10 equation working spatially.
 
 ### 4.5 Camera
 
@@ -210,15 +250,14 @@ off-screen pressure cues (§4.5) necessary rather than decorative.
 | Camera bounds | Clamped to world edges | **[FROZEN]** |
 | Temporary multi-pressure zoom-out | Deferred to polish | **[FROZEN]** |
 
-**[FROZEN]** **Phase 1 may use a static camera window**, because the Phase 1
-sandbox does not yet need coastline patrol. **Semi-scrolling begins when the
-formation spans the coast** — that is, from the phase in which the line is
-present across the shoreline.
+> **Amended 2026-08-06 (§22).** Horizontal scrolling is no longer deferrable: it
+> is how the player travels between the front and a breakthrough heading for the
+> village. It is required from the first playable milestone.
 
 **[DERIVED]** A 240 px deadzone inside an 800 px viewport leaves 280 px on each
-side before the camera moves, so ordinary attacking and repositioning near a
-pressure point will not scroll the view — the camera reacts to travel along the
-coast, not to local footwork.
+side before the camera moves, so ordinary attacking and footwork at the front
+will not scroll the view — the camera reacts to travel along the beach, not to
+local movement.
 
 **[OPEN]** The visual form of the screen-edge indicators.
 
@@ -226,61 +265,80 @@ coast, not to local footwork.
 
 **[FROZEN]** The formation contains **8 total defenders including the player**.
 
-**[FROZEN]** The formation holds a **line along the shoreline** in the shallows.
+**[FROZEN]** The defenders hold a **front** on the sea-to-village axis (§4.4).
 
-**[FROZEN]** The player is the formation's only free agent. The other 7 defenders
-are bound to the formation.
+**[FROZEN]** The player is the only free agent. The other 7 defenders hold the
+front and do not chase.
 
 **[DERIVED]** The formation therefore needs, at minimum:
-- an ordered set of **slots** along the horizontal axis;
-- a **formation depth** (the current `y` of the line), moved by Advance and Fall
-  Back and clamped per §4.3;
+- a **front position** on the x axis, moved by Advance and Fall Back and clamped
+  per §4.3;
+- per-defender stations spread around that front;
 - a **posture** (the current standing command, per §11);
-- per-slot occupancy, so a slot whose defender is knocked down is recognisable as
-  a gap.
+- station occupancy, so a knocked-down defender leaves a recognisable gap.
 
-**[OPEN]** Whether slots are fixed positions or relative offsets; whether the
-player occupies a slot or is fully unbound; how a knocked-down defender's slot is
-represented and whether neighbours shift to cover it.
+**[OPEN]** Station spacing; whether the player occupies a station or is fully
+unbound; whether neighbours close a gap left by a knocked-down defender.
 
 ## 6. Pressure-point rules
 
-**[FROZEN]** Pressure points identify **local sections of the line that need
-player help**.
+> **Amended 2026-08-06 (§22).** On a single axis, a pressure point is no longer a
+> section of coastline. There are exactly two kinds, and both are positions on
+> the sea-to-village axis.
+
+**[FROZEN]** Two kinds of pressure, both of which the player must travel to:
+
+1. **A losing scuffle at the front** — an invader winning against the defender
+   facing it. The player joins to make it two-on-one.
+2. **A breakthrough** — an invader that got past the front and is walking left
+   toward the village. The player must break off and intercept.
 
 **[FROZEN]** At most **one strong pressure cue during onboarding**, and **at most
 two later**.
 
-**[DERIVED]** The cue cap is a legibility guarantee for a 10-year-old, not a
-spawn cap. It constrains how many pressure points may be *signalled as strong* at
-once; it does not by itself constrain how many line sections are under load.
+**[DERIVED]** A breakthrough is the mode's sharpest decision and its main source
+of tension, because its cost scales with how far the player has pushed the front
+seaward (§4.3.1). It is also historically grounded: Pigafetta records houses
+being burned, so some of the landing party did get inland.
 
-**[DERIVED]** Pressure points are the navigational spine of the mode: they are
-what the free agent moves *between*, and what the screen-edge indicators (§4.5)
-point at when off-screen.
+**[DERIVED]** Pressure points remain the navigational spine and remain what the
+screen-edge indicators point at — the axis they live on has changed, not their
+role.
 
-**[OPEN]** How a pressure point is computed (local invader-to-defender ratio,
-defender composure, slot gaps, or a combination); its severity thresholds; how it
-is signalled on-screen; and how long a cue persists after the condition clears.
+**[OPEN]** How a losing scuffle is computed and signalled; severity thresholds;
+how long a cue persists after the condition clears.
 
 ## 7. Player state machine
 
-**[FROZEN]** Player abilities in the initial baseline are exactly:
+> **Amended 2026-08-06 (§22).** Jump is reinstated and brace is merged into
+> crouch. Movement is horizontal only.
 
-1. **Movement**
+**[FROZEN]** Player abilities:
+
+1. **Movement** — left and right only. There is no vertical player movement.
 2. **Deliberate attack**
-3. **Brace / block**
-4. **Short repositioning dash**
-5. **Formation commands** — Hold / Advance / Fall Back (§11)
+3. **Crouch, which *is* brace** — planting your feet is the block
+4. **Jump** — reposition, vault, and dodge
+5. **Short repositioning dash** — travel between the front and a breakthrough
+6. **Formation commands** — Hold / Advance / Fall Back (§11)
 
-**[FROZEN]** Jump is **excluded** from the initial implementation.
+**[FROZEN]** **Crouch and brace are one action, not two.** Crouching is
+physically what planting yourself against a charge looks like, it reuses the
+existing guard meter unchanged, and it keeps the control count low enough for a
+Grade 5 player.
 
 **[FROZEN]** "Deliberate attack" — the attack is a committed action, not a
 spammable one. The player wins by positioning, not by output.
 
+**[DERIVED]** The player character is an **unnamed adult defender**, so the
+moveset requires adult **jump** and **crouch** sprite sheets, which do not exist
+yet. Only the child sheets currently carry that moveset. Two new PixelLab sheets
+are required; no other art is blocked.
+
 **[DERIVED]** The minimum state set is therefore: `idle`, `moving`, `attacking`,
-`bracing`, `dashing`, `knocked_down`, `recovering`. Formation commands are issued
-from any non-committed state and do not interrupt the player's own action.
+`crouching`, `airborne`, `dashing`, `knocked_down`, `recovering`. Formation
+commands are issued from any non-committed state and do not interrupt the
+player's own action.
 
 **[DERIVED]** The player is subject to footing/composure and knockdown like any
 other defender (§10) — the player has no separate survival model, because the
@@ -410,12 +468,16 @@ input debounce; whether a command applies to the whole line or to a section.
 
 ## 12. Terrain behavior
 
-**[FROZEN]** The five depth bands of §4.2 are the terrain model.
+> **Amended 2026-08-06 (§22).** Terrain regions run left-to-right (§4.2) and are
+> keyed to `x`, not `y`. Their effects are otherwise unchanged, and they now
+> carry the mode's central strategic mechanic (§4.3.1).
 
-**[FROZEN]** The coral reef sits between the deep-water approach and the
-shallows, on the invaders' path.
+**[FROZEN]** The five terrain regions of §4.2 are the terrain model.
 
-**[FROZEN]** Fall Back never enters the village band.
+**[FROZEN]** The coral reef sits at the seaward end, where the boats ground and
+the invaders enter.
+
+**[FROZEN]** Fall Back never enters the village region.
 
 **[DERIVED]** The reef is the environmental expression of the arc's central
 teachable ("mababaw ang tubig" — the water is shallow) and of the approved
@@ -424,11 +486,12 @@ historical gate: large craft could not reach dry shore.
 ### 12.1 Terrain effects
 
 **[FROZEN]** Terrain acts on invaders through **movement and recovery
-multipliers keyed to the depth band**, and nothing more.
+multipliers keyed to the terrain region**, and nothing more.
 
-- **[FROZEN]** Invaders move **more slowly** in the deep-water and coral bands.
-- **[FROZEN]** Invaders recover **more slowly** from push and stagger while in
-  the coral band.
+- **[FROZEN]** Invaders move **more slowly** in the shallows and on the reef, and
+  at **full speed on dry sand**.
+- **[FROZEN]** Invaders recover **more slowly** from push and stagger while on
+  the reef or in the shallows.
 - **[FROZEN]** Concentrated defender pressure is therefore **more effective**
   while an invader has poor footing in coral or shallow water.
 - **[FROZEN]** Defenders move **normally** within the approved fighting area.
@@ -440,7 +503,7 @@ weakened the landing force.
 
 ### 12.2 Implementation constraints
 
-**[FROZEN]** Terrain is implemented as **readable horizontal bands with simple
+**[FROZEN]** Terrain is implemented as **readable regions with simple
 multipliers**. Explicitly excluded from the baseline:
 
 - per-tile terrain
@@ -448,8 +511,8 @@ multipliers**. Explicitly excluded from the baseline:
 - procedural obstacles
 - complex collision
 
-**[DERIVED]** A band lookup is therefore a function of `y` alone — the actor's
-current band selects its multipliers. No terrain geometry, grid, or navmesh is
+**[DERIVED]** A region lookup is therefore a function of `x` alone — the actor's
+current region selects its multipliers. No terrain geometry, grid, or navmesh is
 required, and none should be introduced.
 
 ### 12.3 Starting multipliers
@@ -458,11 +521,12 @@ required, and none should be introduced.
 
 | Multiplier | Value |
 |---|---|
-| Invader movement — deep water | **0.50** |
-| Invader movement — coral | **0.65** |
-| Invader movement — shallows | **0.80** |
-| Invader stagger/push recovery duration — coral | **× 1.35** |
-| Defender movement — fighting zone | **1.00** |
+| Invader movement — reef | **0.50** |
+| Invader movement — shallows | **0.65** |
+| Invader movement — wet sand / shoreline | **0.80** |
+| Invader movement — dry sand | **1.00** |
+| Invader stagger/push recovery duration — reef and shallows | **× 1.35** |
+| Defender movement — everywhere | **1.00** |
 
 **[DERIVED]** The gradient runs 0.50 → 0.65 → 0.80: invaders accelerate as they
 close, so the crossing reads as a costly approach that eases only once they
@@ -859,3 +923,73 @@ world, depth bands, camera, and a movable player. Every input it requires — wo
 size, band boundaries, camera constants, presenter filename, registry key, and
 the rule that the relay route is untouched — is now recorded. The remaining open
 items all belong to Phase 2 or later.
+
+---
+
+## 22. Amendment record — 2026-08-06: side-scrolling shoreline
+
+**This amendment replaces the battlefield's spatial model.** It follows a manual
+playtest of the three-lane prototype and supersedes the affected parts of §4–§7
+and §12. Every combat system is untouched.
+
+### What changed and why
+
+The lane prototype was technically correct against the specification and felt
+wrong to play. **Vertical lane movement fights the side-facing sprite set.**
+Beat-em-ups make that combination work with a perspective ground plane, shadows,
+depth scaling and a lane pitch well under a body height; we had none of those,
+and a fifth of the frame was spent on a depth axis the art could not sell.
+
+Rather than buy those four things — each of which is something generated art is
+poor at and a solo developer has least time for — the project rotated the world.
+
+| Was | Now |
+|---|---|
+| Shoreline on the horizontal axis | Sea-to-village depth on the horizontal axis |
+| Sea at the top, village at the bottom | **Sea and ships right, village left** |
+| Shallow-oblique 3/4 | **Pure side view, one ground line, gravity** |
+| Three depth lanes, discrete stepping | **No lanes. Horizontal movement only.** |
+| Jump excluded | **Jump reinstated; crouch *is* brace** |
+| Depth bands keyed to `y` | Terrain regions keyed to `x` |
+
+### The depth mechanic this adds
+
+Rotating the world alone would have removed a tactical layer. **§4.3.1 replaces
+it**: the position of the front along the sea-to-village axis is simultaneously
+the difficulty dial, the score, and the strategic decision.
+
+- Fighting in the water favours the defenders; fighting on dry sand favours the
+  invaders. That is the history as a mechanic.
+- The front's position *is* the progress indicator — no bar required.
+- Pushing seaward buys terrain advantage and spends rear security, because a
+  breakthrough then has a longer clear run at the village.
+
+### Preserved unchanged
+
+Every combat system: attack windup/active/recovery, guard-metered brace, poise
+and the break-gated stagger, repel stability and its regeneration, composure and
+knockdown, dash, hit feedback, the persistent ally, and the looping respawn.
+Also §10's frozen equation, §16's fixed victory and rally model, §17's testing
+strategy, §18.1's presenter and routing strategy, the historical gate, and the
+entire Cinematic & Experience Design and Battle Pacing documents.
+
+### Consequences recorded
+
+- **`MAC-ENV-001` becomes correct as written.** Its prompt already describes this
+  exact cross-section with a ground baseline at y=536. It no longer needs a
+  rewrite.
+- **Two new PixelLab sheets are required:** adult jump and adult crouch. Only the
+  child sheets currently carry that moveset, and the player is an adult (§7).
+- **Horizontal camera scrolling is no longer deferrable** (§4.5).
+- **The lane work is preserved, not merged:** branch
+  `feature/mactan-lane-geometry`, commit `450b6b5`. Tag
+  `formation-phase1-freeform` remains the free-Y baseline and
+  `mactan-relay-fallback` remains the deeper fallback.
+
+### Newly opened by this amendment
+
+Front-stretch width (§4.4); station spacing and gap-closing (§5); how a losing
+scuffle is computed and signalled (§6); jump height and duration, crouch-brace
+timing, and whether jump grants any invulnerability (§7); how Advance and Fall
+Back move the front and by how much (§11); and whether sparse ranged fire from
+the boats is added once crouch-brace exists.
